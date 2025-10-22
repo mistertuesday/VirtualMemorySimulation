@@ -102,7 +102,7 @@ public class VirtualMemorySimulation {
         System.out.printf("%-30s %d%%\n", "Percent Memory Used by System:", used_memory); 
         System.out.printf("%-30s %d\n", "Instructions / Time Slice:", instructions);      
 
-        //Print Cache Calculated Values
+        //Print Cache calculated values
         System.out.println("\n***** Cache Calculated Values *****\n");
         System.out.printf("%-30s %d\n", "Total # Blocks:", total_blocks); 
         System.out.printf("%-30s %d bits\n", "Tag Size:", tag_size);
@@ -113,6 +113,12 @@ public class VirtualMemorySimulation {
                 (double)imp_mem_size/KB, imp_mem_size);
         System.out.printf("%-30s $%.2f @ $%s per KB\n", "Cost:", cost, PRICE_PER_KB); 
 
+        //Print Physical Memory calculated values
+        System.out.println("\n***** Physical Memory Calculated Values *****\n");
+        System.out.printf("%-30s %d\n", "Number of Physical Pages:", num_physical_pages);
+        System.out.printf("%-30s %d\n", "Number of Pages for System:", number_pages);
+        System.out.printf("%-30s %d bits\n", "Size of Page Table Entry:", pte_size);
+        System.out.printf("%-30s %d bytes\n", "Total RAM for Page Table(s):", total_ram);
 
     }
 
