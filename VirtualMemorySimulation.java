@@ -80,7 +80,7 @@ public class VirtualMemorySimulation {
         //Calculate Cache Values
         total_blocks = calcBlocks(cache_size, block_size);
         index_size = calcIndex(cache_size, block_size, associativity);
-        tag_size = calcTagSize(cache_size, block_size, associativity);
+        tag_size = calcTagSize(physical_memory, index_size, block_size);
         
 
         //Print header
@@ -133,8 +133,8 @@ public class VirtualMemorySimulation {
     }   
     
     //Method for calculating tag size required for cache
-    private static int calcTagSize(int cache_size, int block_size, int associativity) {
-        return 0;
+    private static int calcTagSize(int physical_memory, int index_size, int block_size) {
+        return getPower(physical_memory*MB) - (index_size + getPower(block_size));
     }
 
     //Helper method -- takes base and returns the exponent, for powers of 2
