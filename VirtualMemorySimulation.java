@@ -2,11 +2,13 @@ import java.util.ArrayList;
 import java.lang.Math;
 
 public class VirtualMemorySimulation {
-    //KB, MB for easy calculations
+    //KB, MB, B for easy calculations
     static int BYTE = 8;
     static int KB = 1024;
     static int MB = 1048576;
+    //Price for cost calculations, per KB
     static String PRICE_PER_KB = "0.07";
+
     public static void main(String[] args) {
 
 
