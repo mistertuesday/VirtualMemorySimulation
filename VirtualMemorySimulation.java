@@ -3,10 +3,10 @@ import java.lang.Math;
 
 public class VirtualMemorySimulation {
     //KB, MB for easy calculations
-    static int Byte = 8;
+    static int BYTE = 8;
     static int KB = 1024;
     static int MB = 1048576;
-
+    static String PRICE_PER_KB = "0.07";
     public static void main(String[] args) {
 
 
@@ -105,7 +105,15 @@ public class VirtualMemorySimulation {
         //Print Cache Calculated Values
         System.out.println("\n***** Cache Calculated Values *****\n");
         System.out.printf("%-30s %d\n", "Total # Blocks:", total_blocks); 
-        System.out.printf("%-30s %d\n", "Index Size:", index_size);
+        System.out.printf("%-30s %d bits\n", "Tag Size:", tag_size);
+        System.out.printf("%-30s %d bits\n", "Index Size:", index_size);
+        System.out.printf("%-30s %d\n", "Total # Rows:", total_rows);
+        System.out.printf("%-30s %d bytes\n", "Overhead Size:", overhead_size); 
+        System.out.printf("%-30s %.2f KB (%d bytes)\n", "Implementation Memory Size:",
+                (double)imp_mem_size/KB, imp_mem_size);
+        System.out.printf("%-30s $%.2f @ $%s per KB\n", "Cost:", cost, PRICE_PER_KB); 
+
+
     }
 
     //Method for calculating total number of blocks, given cache sizse and block size
