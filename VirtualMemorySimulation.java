@@ -2,6 +2,11 @@ import java.util.ArrayList;
 import java.lang.Math;
 
 public class VirtualMemorySimulation {
+    //KB, MB for easy calculations
+    static int Byte = 8;
+    static int KB = 1024;
+    static int MB = 1048576;
+
     public static void main(String[] args) {
 
 
@@ -98,11 +103,11 @@ public class VirtualMemorySimulation {
 
         //Print Cache Calculated Values
         System.out.println("\n***** Cache Calculated Values *****\n");
-        //System.out.printf("%-30s %d\n","", 0); 
+        System.out.printf("%-30s %d\n", "Total # Blocks:", total_blocks); 
     }
 
     private static int calcBlocks(int cache_size, int block_size) {
-        return 0;
+        return (cache_size*KB)/block_size;
     }
     private static int calcTagSize(int cache_size, int block_size, int associativity)
     {
