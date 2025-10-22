@@ -1,17 +1,34 @@
 import java.util.ArrayList;
+import java.lang.Math;
+
 public class VirtualMemorySimulation {
     public static void main(String[] args) {
 
 
         //Declare variables to hold each token passed by command line
-        int cache_size=0;
-        int block_size=0;
-        int associativity=0;
+        int cache_size = 0;
+        int block_size = 0;
+        int associativity = 0;
         String replacement_policy = new String();
-        int physical_memory=0;
-        int used_memory=0;
-        int instructions=0;
+        int physical_memory = 0;
+        int used_memory= 0 ;
+        int instructions= 0 ;
         ArrayList<String> files = new ArrayList<>();
+        
+        //Declare calculated variables for Cache
+        int total_blocks = 0;
+        int tag_size = 0;
+        int index_size = 0;
+        int total_rows = 0;
+        int overhead_size = 0;
+        int imp_mem_size = 0;
+        double cost = 0;
+
+        //Declare calcluated variables for Physical Memory
+        int num_physical_pages = 0;
+        int number_pages = 0;
+        int pte_size = 0;
+        int total_ram = 0;
 
         //Parse tokens
         for(int i = 0; i < args.length; i = i + 2)
@@ -35,7 +52,10 @@ public class VirtualMemorySimulation {
                     break;
                 case "–r":
                 case "-r":
-                    replacement_policy = args[i + 1];
+                    if(args[i+1].equals("rr"))
+                        replacement_policy = "Round Robin";
+                    else
+                        replacement_policy = "Random";
                     break;
                 case "–p":
                 case "-p":
@@ -51,10 +71,14 @@ public class VirtualMemorySimulation {
                     break;
             }
         }
+
+        //Calculate Cache Values
+        total_blocks = calcBlocks(cache_size, block_size);
+        tag_size = calcTagSize(cache_size, block_size, associativity);
         
 
         //Print header
-        System.out.printf("Cache Simulator - CS 3853 – Team #15\n\n");
+        System.out.println("Cache Simulator - CS 3853 – Team #15\n");
         System.out.printf("Trace File(s):\n");
         
         //Print list of trace files
@@ -70,8 +94,20 @@ public class VirtualMemorySimulation {
         System.out.printf("%-30s %s\n", "Replacement Policy:",  replacement_policy);
         System.out.printf("%-30s %d MB\n", "Physical Memory:", physical_memory);
         System.out.printf("%-30s %d%%\n", "Percent Memory Used by System:", used_memory); 
-        System.out.printf("%-30s %d\n", "Instructions / Time Slice:", instructions);
-        
+        System.out.printf("%-30s %d\n", "Instructions / Time Slice:", instructions);      
+
+        //Print Cache Calculated Values
+        System.out.println("\n***** Cache Calculated Values *****\n");
+        //System.out.printf("%-30s %d\n","", 0); 
     }
+
+    private static int calcBlocks(int cache_size, int block_size) {
+        return 0;
+    }
+    private static int calcTagSize(int cache_size, int block_size, int associativity)
+    {
+        return 0;
+    }
+
 }
 
