@@ -122,6 +122,15 @@ public class VirtualMemorySimulation {
 
     }
 
+
+
+
+    //CALCULATION METHODS
+    //
+    //
+    //CACHE CALC METHODS
+    //
+    //
     //Method for calculating total number of blocks, given cache sizse and block size
     private static int calcBlocks(int cache_size, int block_size) {
         return (cache_size*KB)/block_size;
