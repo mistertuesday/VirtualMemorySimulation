@@ -79,6 +79,7 @@ public class VirtualMemorySimulation {
 
         //Calculate Cache Values
         total_blocks = calcBlocks(cache_size, block_size);
+        index_size = calcIndex(cache_size, block_size, associativity);
         tag_size = calcTagSize(cache_size, block_size, associativity);
         
 
@@ -104,15 +105,27 @@ public class VirtualMemorySimulation {
         //Print Cache Calculated Values
         System.out.println("\n***** Cache Calculated Values *****\n");
         System.out.printf("%-30s %d\n", "Total # Blocks:", total_blocks); 
+        System.out.printf("%-30s %d\n", "Index Size:", index_size);
     }
 
+    //Method for calculating total number of blocks, given cache sizse and block size
     private static int calcBlocks(int cache_size, int block_size) {
         return (cache_size*KB)/block_size;
     }
-    private static int calcTagSize(int cache_size, int block_size, int associativity)
-    {
+
+    //Method for calculating index bits required for cache
+    private static int calcIndex(int cache_size, int block_size, int associativity) {
+        return getPower(cache_size*KB) - (getPower(block_size) + getPower(associativity));
+    }   
+    
+    //Method for calculating tag size required for cache
+    private static int calcTagSize(int cache_size, int block_size, int associativity) {
         return 0;
     }
 
+    //Helper method -- takes base and returns the exponent, for powers of 2
+    private static int getPower(int base) {
+        return (int)(Math.log(base)/Math.log(2));
+    }
 }
 
