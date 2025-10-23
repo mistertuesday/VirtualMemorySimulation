@@ -85,7 +85,7 @@ public class VirtualMemorySimulation {
         index_size = calcIndex(cache_size, block_size, associativity);
         tag_size = calcTagSize(physical_memory, index_size, block_size);
         total_rows = calcTotalRows(index_size);        
-
+        overhead_size = calcOverhead(total_blocks, tag_size);
         //Print header
         System.out.println("Cache Simulator - CS 3853 – Team #15\n");
         System.out.printf("Trace File(s):\n");
@@ -154,6 +154,10 @@ public class VirtualMemorySimulation {
         return (int)Math.pow(2, index_size);
     }
 
+    //Method for calculating overhead for cache
+    private static int calcOverhead(int total_blocks, int tag_size) {
+        return ((tag_size+1)*total_blocks)/BYTE;
+    }
     //Helper method -- takes base and returns the exponent, for powers of 2
     private static int getPower(int base) {
         return (int)(Math.log(base)/Math.log(2));
