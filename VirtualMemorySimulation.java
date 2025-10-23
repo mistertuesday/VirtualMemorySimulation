@@ -35,9 +35,10 @@ public class VirtualMemorySimulation {
 
         //Declare calcluated variables for Physical Memory
         int num_physical_pages = 0;
-        int number_pages = 0;
+        int num_system_pages = 0;
         int pte_size = 0;
         int total_ram = 0;
+        int num_of_files = 0;
 
         //Parse tokens
         for(int i = 0; i < args.length; i = i + 2) {
@@ -89,6 +90,13 @@ public class VirtualMemorySimulation {
         imp_mem_size = calcImpMemory(overhead_size, cache_size);
         cost = calcCost(imp_mem_size);
 
+        //Calculate Physical Memory Values
+        num_of_files = files.size();
+        num_physical_pages = calcPhysicalPages(physical_memory);
+        num_system_pages = calcSystemPages(num_physical_pages, used_memory);
+        pte_size = calcPTESize(num_physical_pages);
+        total_ram = calcTotalRam(cache_size, num_of_files, pte_size);
+
         //Print header
         System.out.println("Cache Simulator - CS 3853 – Team #15\n");
         System.out.printf("Trace File(s):\n");
@@ -122,7 +130,7 @@ public class VirtualMemorySimulation {
         //Print Physical Memory calculated values
         System.out.println("\n***** Physical Memory Calculated Values *****\n");
         System.out.printf("%-30s %d\n", "Number of Physical Pages:", num_physical_pages);
-        System.out.printf("%-30s %d\n", "Number of Pages for System:", number_pages);
+        System.out.printf("%-30s %d\n", "Number of Pages for System:", num_system_pages);
         System.out.printf("%-30s %d bits\n", "Size of Page Table Entry:", pte_size);
         System.out.printf("%-30s %d bytes\n", "Total RAM for Page Table(s):", total_ram);
 
@@ -170,6 +178,28 @@ public class VirtualMemorySimulation {
     //Method for calculating cost of cache
     private static double calcCost(int imp_mem_size) {
         return (imp_mem_size/KB) * PRICE_PER_KB;
+    }
+
+    //PHYSICAL MEMORY CALC METHODS
+    //
+    //Method for calculating number of physical pages
+    private static int calcPhysicalPages(int physical_memory) {
+        return (physical_memory*MB)/(4*KB);
+    }
+
+    //Method for calculating number of pages for system
+    private static int calcSystemPages(int num_physical_pages, int used_memory) {
+        return (int)(((double)used_memory/100)*num_physical_pages);
+    }
+    
+    //Method for calculating PTE size
+    private static int calcPTESize(int num_physical_pages) {
+        return getPower(num_physical_pages) + 1;
+    }
+
+    //Method for calculating RAM needed
+    private static int calcTotalRam(int cache_size, int num_of_files, int pte_size) {
+        return (cache_size*KB*num_of_files*pte_size)/BYTE;
     }
 
     //Helper method -- takes base and returns the exponent, for powers of 2
