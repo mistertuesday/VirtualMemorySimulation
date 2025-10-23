@@ -2,12 +2,14 @@ import java.util.ArrayList;
 import java.lang.Math;
 
 public class VirtualMemorySimulation {
+    
     //KB, MB, B for easy calculations
     static int BYTE = 8;
     static int KB = 1024;
     static int MB = 1048576;
+
     //Price for cost calculations, per KB
-    static String PRICE_PER_KB = "0.07";
+    static double PRICE_PER_KB = 0.07;
 
     public static void main(String[] args) {
 
@@ -18,8 +20,8 @@ public class VirtualMemorySimulation {
         int associativity = 0;
         String replacement_policy = new String();
         int physical_memory = 0;
-        int used_memory= 0 ;
-        int instructions= 0 ;
+        int used_memory = 0 ;
+        int instructions = 0 ;
         ArrayList<String> files = new ArrayList<>();
         
         //Declare calculated variables for Cache
@@ -38,8 +40,7 @@ public class VirtualMemorySimulation {
         int total_ram = 0;
 
         //Parse tokens
-        for(int i = 0; i < args.length; i = i + 2)
-        {
+        for(int i = 0; i < args.length; i = i + 2) {
             switch(args[i]) {
                 case "–f":
                 case "-f":
@@ -83,7 +84,7 @@ public class VirtualMemorySimulation {
         total_blocks = calcBlocks(cache_size, block_size);
         index_size = calcIndex(cache_size, block_size, associativity);
         tag_size = calcTagSize(physical_memory, index_size, block_size);
-        
+        total_rows = calcTotalRows(index_size);        
 
         //Print header
         System.out.println("Cache Simulator - CS 3853 – Team #15\n");
@@ -113,7 +114,7 @@ public class VirtualMemorySimulation {
         System.out.printf("%-30s %d bytes\n", "Overhead Size:", overhead_size); 
         System.out.printf("%-30s %.2f KB (%d bytes)\n", "Implementation Memory Size:",
                 (double)imp_mem_size/KB, imp_mem_size);
-        System.out.printf("%-30s $%.2f @ $%s per KB\n", "Cost:", cost, PRICE_PER_KB); 
+        System.out.printf("%-30s $%.2f @ $%.2f per KB\n", "Cost:", cost, PRICE_PER_KB); 
 
         //Print Physical Memory calculated values
         System.out.println("\n***** Physical Memory Calculated Values *****\n");
@@ -146,6 +147,11 @@ public class VirtualMemorySimulation {
     //Method for calculating tag size required for cache
     private static int calcTagSize(int physical_memory, int index_size, int block_size) {
         return getPower(physical_memory*MB) - (index_size + getPower(block_size));
+    }
+
+    //Method for calculating total number of rows
+    private static int calcTotalRows(int index_size) {
+        return (int)Math.pow(2, index_size);
     }
 
     //Helper method -- takes base and returns the exponent, for powers of 2
