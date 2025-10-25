@@ -43,39 +43,47 @@ public class VirtualMemorySimulation {
         //Parse tokens
         for(int i = 0; i < args.length; i = i + 2) {
             switch(args[i]) {
-                case "–f":
                 case "-f":
+                case "–f":
+                case "—f":
                     files.add(args[i + 1]);
                     break;
-                case "–s":
                 case "-s":
+                case "–s":
+                case "—s":
                     cache_size = Integer.parseInt(args[i + 1]);
                     break;
-                case "–b":
                 case "-b":
+                case "–b":
+                case "—b":
                     block_size = Integer.parseInt(args[i + 1]);
                     break;
-                case "–a":
                 case "-a":
+                case "–a":
+                case "—a":
                     associativity = Integer.parseInt(args[i + 1]);
                     break;
-                case "–r":
                 case "-r":
+                case "–r":
+                case "—r":
                     if(args[i+1].equals("rr"))
                         replacement_policy = "Round Robin";
                     else
                         replacement_policy = "Random";
                     break;
-                case "–p":
                 case "-p":
+                case "–p":
+                case "—p":
                     physical_memory = Integer.parseInt(args[i + 1]);
                     break;
-                case "–u":
                 case "-u":
+                case "–u":
+                case "—u":
                     used_memory = Integer.parseInt(args[i + 1]);
                     break;
-                case "–n":
                 case "-n":
+                case "–n":
+                case "—n":
                     instructions = Integer.parseInt(args[i+1]);
                     break;
             }
