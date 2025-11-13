@@ -4,10 +4,9 @@ public class VirtualMemory {
     static int TABLE_SIZE = 524288;                         //page table size
     private PriorityQueue<PhysicalAddress> physical_queue;  //priority queue with physicaladdresses
     private ArrayList<PageTable> page_tables;               //arraylist with each trace file's page table
-    private int access;                                     //current access #
+    private int access;                                     //current access #(increments each time memory is accessed 
 
-    //int to track which file is currently being processed
-    private int access_file;
+    private int access_file;                                //int to track which file is currently being processed
     private int physical_size;
     private ArrayList<String> trace_files;
     
@@ -20,12 +19,16 @@ public class VirtualMemory {
         initializePageTables();
     }
 
+    //Used by the constructor
+    //Will populate the physical_queue, which contains the available physical addresses
     private void populatePhysicalQueue() {
         for(int i = 0; i < physical_size; i++) {
             physical_queue.add(new PhysicalAddress());
         }
     }
 
+    //Used by the constructor
+    //Will initialize the page table for each of the trace files
     private void initializePageTables() {
         for (String trace_file: trace_files) {
             page_tables.add(new PageTable(TABLE_SIZE, trace_file));
@@ -43,6 +46,7 @@ public class VirtualMemory {
 
     public void accessMemory(int virtual_address)
     {
+        page_number = virtual_address >> 12;
         PhysicalAddress temp = getCurrentTable().getAddress(virtual_address);
         if (temp == null) {
             temp = physical_queue.peek();

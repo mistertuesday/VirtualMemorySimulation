@@ -1,5 +1,10 @@
 import java.util.Arrays;
 
+/**
+ * This class implements a page table, which will map, from its index to a PhysicalAddress object
+ * This class has functionality for adding elements, freeing elements, and tracking the page tables hits, free pages allocated, and page fault maps.
+ *
+ */
 public class PageTable {
     //Page table array and trace file name
     private PhysicalAddress[] page_table;
@@ -10,12 +15,17 @@ public class PageTable {
     private int pages_from_free;
     private int pages_from_fault;
 
-
+    //Constructor -- initializes the page table array, as well as name
     public PageTable(int size, String trace_file) {
         this.page_table = new PhysicalAddress[size];
         this.trace_file = trace_file;
     }
 
+    //
+    //
+    //Necessary getters and setters
+    //
+    //
     public PhysicalAddress getAddress(int virtual_address) { 
         return page_table[virtual_address];
     }
@@ -38,10 +48,5 @@ public class PageTable {
 
     public void incrementHits() {
         this.total_hits++;
-    }
-
-
-    public String toString() {
-        return trace_file;
     }
 }
