@@ -1,4 +1,3 @@
-package VirtualMemory.Ram;
 import java.util.Arrays;
 
 public class PageTable {
