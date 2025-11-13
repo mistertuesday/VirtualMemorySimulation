@@ -1,4 +1,5 @@
-import Ram.*;
+package VirtualMemory;
+import VirtualMemory.Ram.*;
 import java.util.ArrayList;
 import java.lang.Math;
 public class VirtualMemorySimulation {
@@ -13,8 +14,6 @@ public class VirtualMemorySimulation {
 
     public static void main(String[] args) {
 
-        PhysicalAddress newAddress = new PhysicalAddress();
-        newAddress.printMe();
         //Declare variables to hold each token passed by command line
         int cache_size = 0;
         int block_size = 0;
@@ -89,7 +88,7 @@ public class VirtualMemorySimulation {
                     break;
             }
         }
-
+        PageTable pageTest = new PageTable(physical_memory,files.get(0));
         //Calculate Cache Values
         total_blocks = calcBlocks(cache_size, block_size);
         index_size = calcIndex(cache_size, block_size, associativity);
