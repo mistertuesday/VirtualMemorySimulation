@@ -153,7 +153,7 @@ public class VirtualMemorySimulation {
         //
         VirtualMemory ram_object = new VirtualMemory((num_physical_pages - num_system_pages),files);
         ArrayList<File> trace_file_list = new ArrayList<File>();
-        ArrayList<ArrayList<Integer>> trace_file_inputs = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<tuple>> trace_file_inputs = new ArrayList<ArrayList<tuple>>();
         for(String file_name: files) {
             trace_file_list.add(new File(file_name));
         }
@@ -161,15 +161,15 @@ public class VirtualMemorySimulation {
         for(int i = 0; i < files.size(); i++) {
             try{
                 File parsing_file = trace_file_list.get(i);
-                ArrayList<Integer> inputs = new ArrayList<Integer>();
+                ArrayList<tuple> inputs = new ArrayList<tuple>();
                 Scanner file_tracer = new Scanner(parsing_file);
                 while(file_tracer.hasNextLine()) {
                     String line1 = file_tracer.nextLine();
                     String line2 = file_tracer.nextLine();
                     if(file_tracer.hasNextLine()) file_tracer.nextLine();
-                    inputs.add(Integer.decode("0x"+line1.substring(10,18)));
-                    if(line2.charAt(17) != '-') inputs.add(Integer.decode("0x"+line2.substring(6,14)));
-                    if(line2.charAt(46) != '-') inputs.add( Integer.decode("0x" + line2.substring(33,41)));   
+                    inputs.add(new tuple(Integer.decode("0x"+line1.substring(10,18)), Integer.decode(line1.substring(5,6))));
+                    if(line2.charAt(17) != '-') inputs.add(new tuple(Integer.decode("0x"+line2.substring(6,14)),4));
+                    if(line2.charAt(46) != '-') inputs.add(new tuple( Integer.decode("0x" + line2.substring(33,41)),4));   
                 }
                 trace_file_inputs.add(inputs);
             }catch(FileNotFoundException e) {
@@ -180,17 +180,28 @@ public class VirtualMemorySimulation {
 
         //Run simulation through virtual memory
         for(int x = 0; x < trace_file_inputs.size(); x++) {
-            ArrayList<Integer> ints_to_feed = trace_file_inputs.get(x);
+            ArrayList<tuple> ints_to_feed = trace_file_inputs.get(x);
             ram_object.setAccessFile(x);
-            for(int int_to_feed: ints_to_feed) {
-                //System.out.printf("%d ", int_to_feed);
-                ram_object.accessMemory(int_to_feed);
+            for(tuple int_to_feed: ints_to_feed) {
+                int first_address = int_to_feed.getX();
+                int second_address = int_to_feed.getX()+int_to_feed.getY();
+                ram_object.accessMemory(first_address);
+                if(getPage(first_address) != getPage(second_address)) {
+                   // System.out.printf("%d is off\n",int_to_feed.getY());
+                   ram_object.accessMemory(second_address);
+                }
             }
             System.out.printf("Total number of ints to feed: %d\n", ints_to_feed.size());
         }
 
          ram_object.print();
         
+    }
+
+    //SHIFT METHOD FOR CHECKING PAGE CHECKS
+    //
+    private static int getPage(int virtual_address) {
+        return virtual_address >> 12;
     }
 
 

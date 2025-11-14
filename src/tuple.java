@@ -10,6 +10,6 @@ public class tuple {
         this.x2 = x2;
     }
 
-    public int getX() return x1;
-    public int getY() return x2;
+    public int getX(){ return x1;}
+    public int getY(){ return x2;}
 }
