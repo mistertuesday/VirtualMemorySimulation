@@ -167,17 +167,17 @@ public class VirtualMemorySimulation {
                 while(file_tracer.hasNextLine()) {
                     String line1 = file_tracer.nextLine();
                     String line2 = file_tracer.nextLine();
-                    file_tracer.nextLine();
+                    if(file_tracer.hasNextLine()) file_tracer.nextLine();
                     int access_one = Integer.decode("0x"+line1.substring(10,18));
-                    int access_two = Integer.decode("0x"+line2.substring(6,14));
-                    int access_three = Integer.decode("0x"+line2.substring(33,41));
+                    //int access_two = Integer.decode("0x"+line2.substring(6,14));
+                    //int access_three = Integer.decode("0x"+line2.substring(33,41));
                     //System.out.printf("ACCESS ONE: %d\n", access_one);
                    // System.out.printf("ACCESS TWO: %d\n", access_two);
                    // System.out.printf("ACCESS THREE: %d\n", access_three); 
                    inputs.add(access_one);
-                   if(line2.charAt(17) != '-') inputs.add(access_two);
+                   //if(line2.charAt(17) != '-') inputs.add(access_two);
                    //
-                   if(line2.charAt(46) != '-') inputs.add(access_three);   
+                  // if(line2.charAt(46) != '-') inputs.add(access_three);   
                 }
                 trace_file_inputs.add(inputs);
             }catch(FileNotFoundException e) {

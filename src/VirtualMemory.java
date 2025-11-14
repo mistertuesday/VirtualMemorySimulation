@@ -27,7 +27,7 @@ public class VirtualMemory {
         System.out.printf("Size: %d\n", physical_size);
         for(int i = 0; i < physical_size; i++) {
             PhysicalAddress p_addy = new PhysicalAddress();
-            System.out.printf("new: %d\n", p_addy.getPhysicalAddress());
+            //System.out.printf("new: %d\n", p_addy.getPhysicalAddress());
             physical_queue.add(p_addy);
         }
     }
@@ -51,12 +51,13 @@ public class VirtualMemory {
 
     public void accessMemory(int full_virtual_address)
     {
-        System.out.printf("%d\n", full_virtual_address);
         int virtual_address = full_virtual_address >> 12;
+        //System.out.printf("%d\n",virtual_address);
         PhysicalAddress temp = getCurrentTable().getAddress(virtual_address);
         if (temp == null) {
             temp = physical_queue.peek();
             if(temp.getAccessProcess() == -1){
+                System.out.println("Access");
                 getCurrentTable().incrementPagesFree();
             }
             else {
