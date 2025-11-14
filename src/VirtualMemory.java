@@ -21,15 +21,6 @@ public class VirtualMemory {
     }
 
     //Used by the constructor
-    //Will populate the physical_queue, which contains the available physical addresses
-    private void populatePhysicalQueue() {
-        for(int i = 0; i < physical_size; i++) {
-            PhysicalAddress p_addy = new PhysicalAddress();
-            physical_queue.add(p_addy);
-        }
-    }
-
-    //Used by the constructor
     //Will initialize the page table for each of the trace files
     private void initializePageTables() {
         for (String trace_file: trace_files) {
@@ -40,7 +31,6 @@ public class VirtualMemory {
     public void setAccessFile(int new_access_file) {
         this.access_file = new_access_file;
         this.physical_queue = new PriorityQueue<PhysicalAddress>();
-        populatePhysicalQueue();
     }
 
     private PageTable getCurrentTable() {
@@ -51,22 +41,21 @@ public class VirtualMemory {
     public void accessMemory(int full_virtual_address)
     {
         int virtual_address = full_virtual_address >> 12;
-        //System.out.printf("%d\n",virtual_address);
         PhysicalAddress temp = getCurrentTable().getAddress(virtual_address);
         if (temp == null) {
-            temp = physical_queue.peek();
-            if(temp.getAccessProcess() == -1){
+            if (physical_queue.size()<physical_size) {
+                temp = new PhysicalAddress();
                 getCurrentTable().incrementPagesFree();
             }
             else {
+                temp = physical_queue.peek();
                 getCurrentTable().incrementPagesFault();
-                clean(temp);
             }
-            getCurrentTable().setAddress(virtual_address, temp);
         }
         physical_queue.remove(temp);
         temp.setLastAccess(access_time, access_file, virtual_address);
         physical_queue.add(temp);
+        getCurrentTable().setAddress(virtual_address, temp);
         ++access_time;
     }
 
