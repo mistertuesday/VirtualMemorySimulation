@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.lang.Math;
-
+import java.io.File;
+import java.util.Scanner;
+import java.io.FileNotFoundException;
 public class VirtualMemorySimulation {
     
     //KB, MB, B for easy calculations
@@ -11,8 +13,7 @@ public class VirtualMemorySimulation {
     //Price for cost calculations, per KB
     static double PRICE_PER_KB = 0.07;
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws FileNotFoundException {
 
         //Declare variables to hold each token passed by command line
         int cache_size = 0;
@@ -88,7 +89,7 @@ public class VirtualMemorySimulation {
                     break;
             }
         }
-
+        PageTable pageTest = new PageTable(physical_memory,files.get(0));
         //Calculate Cache Values
         total_blocks = calcBlocks(cache_size, block_size);
         index_size = calcIndex(cache_size, block_size, associativity);
@@ -141,11 +142,92 @@ public class VirtualMemorySimulation {
         System.out.printf("%-30s %d\n", "Number of Pages for System:", num_system_pages);
         System.out.printf("%-30s %d bits\n", "Size of Page Table Entry:", pte_size);
         System.out.printf("%-30s %d bytes\n", "Total RAM for Page Table(s):", total_ram);
+        
+        //MILESTONE 2
+        //Create vram object!
+        VirtualMemory ram_object = new VirtualMemory((num_physical_pages - num_system_pages),files);
+        //Create one list of tuples for each trace file, store each list in another list.
+        ArrayList<ArrayList<Tuple>> trace_file_inputs = new ArrayList<ArrayList<Tuple>>();
+        //Parse each trace file and add it to our list of tuple sets.
+        for(String file_name: files) {
+        	trace_file_inputs.add(trace(file_name));
+        }
+        //Run simulation through virtual memory
+        for(int x = 0; x < trace_file_inputs.size(); x++) {
+        	//Load up one of the trace file instruction sets
+            ArrayList<Tuple> ints_to_feed = trace_file_inputs.get(x);
+            //Set the access file and queue for the vram object
+            ram_object.setAccessFile(x);
+            //Run through each of the instructions.
+            for(Tuple int_to_feed: ints_to_feed) {
+            	//Get the first mem address
+                int first_address = int_to_feed.getX();
+                //Offset by the byte count to get the second one
+                int second_address = int_to_feed.getX()+int_to_feed.getY();
+                //Access the memory at the first address
+                ram_object.accessMemory(first_address);
+                //If the page numbers for the first and second address don't line up...
+                //that means we've gone forwards a page and need to run another access.
+                if(getPage(first_address) != getPage(second_address)) {
+                   // System.out.printf("%d is off\n",int_to_feed.getY());
+                   ram_object.accessMemory(second_address);
+                }
+            }
+            System.out.printf("Total number of ints to feed: %d\n", ints_to_feed.size());
+        }
 
+         ram_object.print();
+        
     }
 
-
-
+    //SHIFT METHOD FOR CHECKING PAGE CHECKS
+    //
+    private static int getPage(int virtual_address) {
+        return virtual_address >> 12;
+    }
+    
+    //TRACE FILE PARSING - Returns a list of tuple objects corresponding to addresses and byte counts from a singular trace file.
+    private static ArrayList<Tuple> trace(String filename) throws FileNotFoundException {
+    	ArrayList<Tuple> outputs = new ArrayList<>();
+    	File f = new File(filename);
+    	Scanner s = new Scanner(f);
+    	while (s.hasNextLine()) {
+    		//First line is always empty for some odd reason! Just skip it!
+    		String line = s.nextLine();
+    		//And so is the LAST LINE, which means this loop won't terminate right without this next part
+    		if (!s.hasNextLine()) {
+    			break;
+    		}
+    		//Second line, EIP
+    		line = s.nextLine();
+    		//These instruction length lines are in two digit form always, making it super weird.
+    		int iLength;
+    		if (line.charAt(5) == '0') {
+    			iLength = Integer.parseInt(line.substring(6, 7));
+    		}
+    		else {
+    			iLength = Integer.parseInt(line.substring(5, 7));
+    		}
+    		int sAddress = Integer.parseInt(line.substring(11, 18));
+    		outputs.add(new Tuple(sAddress, iLength));
+    		//Third line, dest and source
+    		//Note to self, assignment document says ASSUME ALL VALID DATA ACCESSES ARE 4 BYTES!!!
+    		line = s.nextLine();
+    		int dstM;
+    		if (line.charAt(17) != '-') {
+    			dstM = Integer.parseInt(line.substring(6, 13));
+    			outputs.add(new Tuple(dstM, 4));
+    		}
+    		int srcM;
+    		if (line.charAt(46) != '-') {
+    			srcM = Integer.parseInt(line.substring(33, 40));
+    			outputs.add(new Tuple(srcM, 4));
+    		}
+    	}
+    	//No more lines, bye scanner!
+    	s.close();
+    	return outputs;
+    }
 
     //CALCULATION METHODS
     //
