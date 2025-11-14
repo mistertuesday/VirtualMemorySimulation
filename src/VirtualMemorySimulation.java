@@ -13,7 +13,7 @@ public class VirtualMemorySimulation {
     //Price for cost calculations, per KB
     static double PRICE_PER_KB = 0.07;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
 
         //Declare variables to hold each token passed by command line
         int cache_size = 0;
@@ -142,47 +142,21 @@ public class VirtualMemorySimulation {
         System.out.printf("%-30s %d\n", "Number of Pages for System:", num_system_pages);
         System.out.printf("%-30s %d bits\n", "Size of Page Table Entry:", pte_size);
         System.out.printf("%-30s %d bytes\n", "Total RAM for Page Table(s):", total_ram);
-
-
-
-
-
-
+        
         //MILESTONE 2
-        //First, we need an arraylist with each of the files
-        //
+        //Create vram object!
         VirtualMemory ram_object = new VirtualMemory((num_physical_pages - num_system_pages),files);
-        ArrayList<File> trace_file_list = new ArrayList<File>();
-        ArrayList<ArrayList<tuple>> trace_file_inputs = new ArrayList<ArrayList<tuple>>();
+        //Create one list of tuples for each trace file, store each list in another list.
+        ArrayList<ArrayList<Tuple>> trace_file_inputs = new ArrayList<ArrayList<Tuple>>();
+        //Parse each trace file and add it to our list of tuple sets.
         for(String file_name: files) {
-            trace_file_list.add(new File(file_name));
+        	trace_file_inputs.add(trace(file_name));
         }
-        //Next, parse each file
-        for(int i = 0; i < files.size(); i++) {
-            try{
-                File parsing_file = trace_file_list.get(i);
-                ArrayList<tuple> inputs = new ArrayList<tuple>();
-                Scanner file_tracer = new Scanner(parsing_file);
-                while(file_tracer.hasNextLine()) {
-                    String line1 = file_tracer.nextLine();
-                    String line2 = file_tracer.nextLine();
-                    if(file_tracer.hasNextLine()) file_tracer.nextLine();
-                    inputs.add(new tuple(Integer.decode("0x"+line1.substring(10,18)), Integer.decode(line1.substring(5,6))));
-                    if(line2.charAt(17) != '-') inputs.add(new tuple(Integer.decode("0x"+line2.substring(6,14)),4));
-                    if(line2.charAt(46) != '-') inputs.add(new tuple( Integer.decode("0x" + line2.substring(33,41)),4));   
-                }
-                trace_file_inputs.add(inputs);
-            }catch(FileNotFoundException e) {
-                    System.out.println("FAAAAIL");
-            }
-        }
-
-
         //Run simulation through virtual memory
         for(int x = 0; x < trace_file_inputs.size(); x++) {
-            ArrayList<tuple> ints_to_feed = trace_file_inputs.get(x);
+            ArrayList<Tuple> ints_to_feed = trace_file_inputs.get(x);
             ram_object.setAccessFile(x);
-            for(tuple int_to_feed: ints_to_feed) {
+            for(Tuple int_to_feed: ints_to_feed) {
                 int first_address = int_to_feed.getX();
                 int second_address = int_to_feed.getX()+int_to_feed.getY();
                 ram_object.accessMemory(first_address);
@@ -203,9 +177,49 @@ public class VirtualMemorySimulation {
     private static int getPage(int virtual_address) {
         return virtual_address >> 12;
     }
-
-
-
+    
+    //TRACE FILE PARSING - Returns a list of tuple objects corresponding to addresses and byte counts from a singular trace file.
+    private static ArrayList<Tuple> trace(String filename) throws FileNotFoundException {
+    	ArrayList<Tuple> outputs = new ArrayList<>();
+    	File f = new File(filename);
+    	Scanner s = new Scanner(f);
+    	while (s.hasNextLine()) {
+    		//First line is always empty for some odd reason! Just skip it!
+    		String line = s.nextLine();
+    		//And so is the LAST LINE, which means this loop won't terminate right without this next part
+    		if (!s.hasNextLine()) {
+    			break;
+    		}
+    		//Second line, EIP
+    		line = s.nextLine();
+    		//These instruction length lines are in two digit form always, making it super weird.
+    		int iLength;
+    		if (line.charAt(5) == '0') {
+    			iLength = Integer.parseInt(line.substring(6, 7));
+    		}
+    		else {
+    			iLength = Integer.parseInt(line.substring(5, 7));
+    		}
+    		int sAddress = Integer.parseInt(line.substring(11, 18));
+    		outputs.add(new Tuple(sAddress, iLength));
+    		//Third line, dest and source
+    		//Note to self, assignment document says ASSUME ALL VALID DATA ACCESSES ARE 4 BYTES!!!
+    		line = s.nextLine();
+    		int dstM;
+    		if (line.charAt(17) != '-') {
+    			dstM = Integer.parseInt(line.substring(6, 13));
+    			outputs.add(new Tuple(dstM, 4));
+    		}
+    		int srcM;
+    		if (line.charAt(46) != '-') {
+    			srcM = Integer.parseInt(line.substring(33, 40));
+    			outputs.add(new Tuple(srcM, 4));
+    		}
+    	}
+    	//No more lines, bye scanner!
+    	s.close();
+    	return outputs;
+    }
 
     //CALCULATION METHODS
     //
