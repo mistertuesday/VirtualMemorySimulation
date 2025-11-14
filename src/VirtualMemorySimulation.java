@@ -185,6 +185,7 @@ public class VirtualMemorySimulation {
                 //System.out.printf("%d ", int_to_feed);
                 ram_object.accessMemory(int_to_feed);
             }
+            System.out.printf("Total number of ints to feed: %d\n", ints_to_feed.size());
         }
 
          ram_object.print();

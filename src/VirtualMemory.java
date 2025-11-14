@@ -23,10 +23,8 @@ public class VirtualMemory {
     //Used by the constructor
     //Will populate the physical_queue, which contains the available physical addresses
     private void populatePhysicalQueue() {
-        System.out.printf("Size: %d\n", physical_size);
         for(int i = 0; i < physical_size; i++) {
             PhysicalAddress p_addy = new PhysicalAddress();
-            //System.out.printf("new: %d\n", p_addy.getPhysicalAddress());
             physical_queue.add(p_addy);
         }
     }
