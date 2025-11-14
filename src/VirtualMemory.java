@@ -17,7 +17,6 @@ public class VirtualMemory {
         this.trace_files = trace_files;
         this.physical_queue = new PriorityQueue<PhysicalAddress>();
         this.page_tables = new ArrayList<PageTable>();
-        populatePhysicalQueue();
         initializePageTables();
     }
 
@@ -42,6 +41,8 @@ public class VirtualMemory {
     
     public void setAccessFile(int new_access_file) {
         this.access_file = new_access_file;
+        this.physical_queue = new PriorityQueue<PhysicalAddress>();
+        populatePhysicalQueue();
     }
 
     private PageTable getCurrentTable() {
@@ -57,7 +58,6 @@ public class VirtualMemory {
         if (temp == null) {
             temp = physical_queue.peek();
             if(temp.getAccessProcess() == -1){
-                System.out.println("Access");
                 getCurrentTable().incrementPagesFree();
             }
             else {
@@ -78,6 +78,8 @@ public class VirtualMemory {
     }
 
     public void print() {
-        System.out.printf("There are %s \n", getCurrentTable());
+        for(int i = 0; i < trace_files.size(); i++) {
+            System.out.printf("There are %s for %s \n", page_tables.get(i), trace_files.get(i));
+        }
     }
 }

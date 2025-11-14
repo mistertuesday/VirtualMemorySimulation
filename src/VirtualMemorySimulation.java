@@ -162,29 +162,25 @@ public class VirtualMemorySimulation {
             try{
                 File parsing_file = trace_file_list.get(i);
                 ArrayList<Integer> inputs = new ArrayList<Integer>();
-                ram_object.setAccessFile(i);
                 Scanner file_tracer = new Scanner(parsing_file);
                 while(file_tracer.hasNextLine()) {
                     String line1 = file_tracer.nextLine();
                     String line2 = file_tracer.nextLine();
                     if(file_tracer.hasNextLine()) file_tracer.nextLine();
-                    int access_one = Integer.decode("0x"+line1.substring(10,18));
-                    //int access_two = Integer.decode("0x"+line2.substring(6,14));
-                    //int access_three = Integer.decode("0x"+line2.substring(33,41));
-                    //System.out.printf("ACCESS ONE: %d\n", access_one);
                    // System.out.printf("ACCESS TWO: %d\n", access_two);
                    // System.out.printf("ACCESS THREE: %d\n", access_three); 
-                   inputs.add(access_one);
-                   //if(line2.charAt(17) != '-') inputs.add(access_two);
-                   //
-                  // if(line2.charAt(46) != '-') inputs.add(access_three);   
+                   inputs.add(Integer.decode("0x"+line1.substring(10,18)));
+                   if(line2.charAt(17) != '-') inputs.add(Integer.decode("0x"+line2.substring(6,14)));
+                   if(line2.charAt(46) != '-') inputs.add( Integer.decode("0x" + line2.substring(33,41)));   
                 }
                 trace_file_inputs.add(inputs);
             }catch(FileNotFoundException e) {
                     System.out.println("FAAAAIL");
             }
         }
-        for(ArrayList<Integer> ints_to_feed: trace_file_inputs) {
+        for(int x = 0; x < trace_file_inputs.size(); x++) {
+            ArrayList<Integer> ints_to_feed = trace_file_inputs.get(x);
+            ram_object.setAccessFile(x);
             for(int int_to_feed: ints_to_feed) {
                 //System.out.printf("%d ", int_to_feed);
                 ram_object.accessMemory(int_to_feed);
