@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.lang.Math;
+import java.io.File;
+import java.util.Scanner;
+import java.io.FileNotFoundException;
 public class VirtualMemorySimulation {
     
     //KB, MB, B for easy calculations
@@ -140,6 +143,56 @@ public class VirtualMemorySimulation {
         System.out.printf("%-30s %d bits\n", "Size of Page Table Entry:", pte_size);
         System.out.printf("%-30s %d bytes\n", "Total RAM for Page Table(s):", total_ram);
 
+
+
+
+
+
+        //MILESTONE 2
+        //First, we need an arraylist with each of the files
+        //
+        VirtualMemory ram_object = new VirtualMemory((physical_memory*MB)/(4*KB),files);
+        ArrayList<File> trace_file_list = new ArrayList<File>();
+        ArrayList<ArrayList<Integer>> trace_file_inputs = new ArrayList<ArrayList<Integer>>();
+        for(String file_name: files) {
+            trace_file_list.add(new File(file_name));
+        }
+        //Next, parse each file
+        for(int i = 0; i < files.size(); i++) {
+            try{
+                File parsing_file = trace_file_list.get(i);
+                ArrayList<Integer> inputs = new ArrayList<Integer>();
+                ram_object.setAccessFile(i);
+                Scanner file_tracer = new Scanner(parsing_file);
+                while(file_tracer.hasNextLine()) {
+                    String line1 = file_tracer.nextLine();
+                    String line2 = file_tracer.nextLine();
+                    file_tracer.nextLine();
+                    int access_one = Integer.decode("0x"+line1.substring(10,18));
+                    int access_two = Integer.decode("0x"+line2.substring(6,14));
+                    int access_three = Integer.decode("0x"+line2.substring(33,41));
+                    //System.out.printf("ACCESS ONE: %d\n", access_one);
+                   // System.out.printf("ACCESS TWO: %d\n", access_two);
+                   // System.out.printf("ACCESS THREE: %d\n", access_three); 
+                   inputs.add(access_one);
+                   if(line2.charAt(17) != '-') inputs.add(access_two);
+                   //
+                   if(line2.charAt(46) != '-') inputs.add(access_three);   
+                }
+                trace_file_inputs.add(inputs);
+            }catch(FileNotFoundException e) {
+                    System.out.println("FAAAAIL");
+            }
+        }
+        for(ArrayList<Integer> ints_to_feed: trace_file_inputs) {
+            for(int int_to_feed: ints_to_feed) {
+                //System.out.printf("%d ", int_to_feed);
+                ram_object.accessMemory(int_to_feed);
+            }
+        }
+
+         ram_object.print();
+        
     }
 
 

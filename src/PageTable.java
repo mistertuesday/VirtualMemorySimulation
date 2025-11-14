@@ -19,6 +19,9 @@ public class PageTable {
     public PageTable(int size, String trace_file) {
         this.page_table = new PhysicalAddress[size];
         this.trace_file = trace_file;
+        total_hits = 0;
+        pages_from_free = 0;
+        pages_from_fault = 0;
     }
 
     //
@@ -27,6 +30,7 @@ public class PageTable {
     //
     //
     public PhysicalAddress getAddress(int virtual_address) { 
+        total_hits++;
         return page_table[virtual_address];
     }
 
@@ -48,5 +52,8 @@ public class PageTable {
 
     public void incrementHits() {
         this.total_hits++;
+    }
+    public String toString() {
+        return "There are " + total_hits +" total hits";
     }
 }

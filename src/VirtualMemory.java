@@ -4,7 +4,7 @@ public class VirtualMemory {
     static int TABLE_SIZE = 524288;                         //page table size
     private PriorityQueue<PhysicalAddress> physical_queue;  //priority queue with physicaladdresses
     private ArrayList<PageTable> page_tables;               //arraylist with each trace file's page table
-    private int access;                                     //current access #(increments each time memory is accessed 
+    private int access_time;                                     //current access #(increments each time memory is accessed 
 
     private int access_file;                                //int to track which file is currently being processed
     private int physical_size;
@@ -12,9 +12,11 @@ public class VirtualMemory {
     
     //Constructor
     public VirtualMemory(int physical_size, ArrayList<String> trace_files) {
-        access = 0;
+        access_time = 0;
         this.physical_size = physical_size;
         this.trace_files = trace_files;
+        this.physical_queue = new PriorityQueue<PhysicalAddress>();
+        this.page_tables = new ArrayList<PageTable>();
         populatePhysicalQueue();
         initializePageTables();
     }
@@ -22,8 +24,11 @@ public class VirtualMemory {
     //Used by the constructor
     //Will populate the physical_queue, which contains the available physical addresses
     private void populatePhysicalQueue() {
+        System.out.printf("Size: %d\n", physical_size);
         for(int i = 0; i < physical_size; i++) {
-            physical_queue.add(new PhysicalAddress());
+            PhysicalAddress p_addy = new PhysicalAddress();
+            System.out.printf("new: %d\n", p_addy.getPhysicalAddress());
+            physical_queue.add(p_addy);
         }
     }
 
@@ -44,9 +49,10 @@ public class VirtualMemory {
     }
 
 
-    public void accessMemory(int virtual_address)
+    public void accessMemory(int full_virtual_address)
     {
-        page_number = virtual_address >> 12;
+        System.out.printf("%d\n", full_virtual_address);
+        int virtual_address = full_virtual_address >> 12;
         PhysicalAddress temp = getCurrentTable().getAddress(virtual_address);
         if (temp == null) {
             temp = physical_queue.peek();
@@ -60,11 +66,17 @@ public class VirtualMemory {
             getCurrentTable().setAddress(virtual_address, temp);
         }
         physical_queue.remove(temp);
-        temp.setLastAccess(access, access_file, virtual_address);
+        temp.setLastAccess(access_time, access_file, virtual_address);
         physical_queue.add(temp);
+        ++access_time;
     }
 
     private void clean(PhysicalAddress temp) {
+        //System.out.printf("Replacing %d\n", temp.getPhysicalAddress());
         page_tables.get(temp.getAccessProcess()).clearAddress(temp.getMappedAddress());
+    }
+
+    public void print() {
+        System.out.printf("There are %s \n", getCurrentTable());
     }
 }

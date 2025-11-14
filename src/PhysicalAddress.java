@@ -9,7 +9,7 @@ import java.util.*;
 public class PhysicalAddress implements Comparable<PhysicalAddress> {
     private int last_access;
     private int address;
-    static int CURR_ADDRESS = 0;
+    private static int CURR_ADDRESS = 0;
     private int access_process;
     private int mapped_address;
 
@@ -43,13 +43,14 @@ public class PhysicalAddress implements Comparable<PhysicalAddress> {
         return last_access;
     }
 
+    public int getPhysicalAddress() {
+        return address;
+    }
+
     //Compare to will compare the last access of the processes, so the last accessed memory will get reallocated first
     @Override
     public int compareTo(PhysicalAddress address_two) {
         return last_access - address_two.getLastAccess();
-    }
-    public String toString() {
-        return "HI";
     }
 }
 
