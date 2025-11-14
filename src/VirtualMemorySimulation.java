@@ -154,12 +154,20 @@ public class VirtualMemorySimulation {
         }
         //Run simulation through virtual memory
         for(int x = 0; x < trace_file_inputs.size(); x++) {
+        	//Load up one of the trace file instruction sets
             ArrayList<Tuple> ints_to_feed = trace_file_inputs.get(x);
+            //Set the access file and queue for the vram object
             ram_object.setAccessFile(x);
+            //Run through each of the instructions.
             for(Tuple int_to_feed: ints_to_feed) {
+            	//Get the first mem address
                 int first_address = int_to_feed.getX();
+                //Offset by the byte count to get the second one
                 int second_address = int_to_feed.getX()+int_to_feed.getY();
+                //Access the memory at the first address
                 ram_object.accessMemory(first_address);
+                //If the page numbers for the first and second address don't line up...
+                //that means we've gone forwards a page and need to run another access.
                 if(getPage(first_address) != getPage(second_address)) {
                    // System.out.printf("%d is off\n",int_to_feed.getY());
                    ram_object.accessMemory(second_address);
