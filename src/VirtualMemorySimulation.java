@@ -167,17 +167,18 @@ public class VirtualMemorySimulation {
                     String line1 = file_tracer.nextLine();
                     String line2 = file_tracer.nextLine();
                     if(file_tracer.hasNextLine()) file_tracer.nextLine();
-                   // System.out.printf("ACCESS TWO: %d\n", access_two);
-                   // System.out.printf("ACCESS THREE: %d\n", access_three); 
-                   inputs.add(Integer.decode("0x"+line1.substring(10,18)));
-                   if(line2.charAt(17) != '-') inputs.add(Integer.decode("0x"+line2.substring(6,14)));
-                   if(line2.charAt(46) != '-') inputs.add( Integer.decode("0x" + line2.substring(33,41)));   
+                    inputs.add(Integer.decode("0x"+line1.substring(10,18)));
+                    if(line2.charAt(17) != '-') inputs.add(Integer.decode("0x"+line2.substring(6,14)));
+                    if(line2.charAt(46) != '-') inputs.add( Integer.decode("0x" + line2.substring(33,41)));   
                 }
                 trace_file_inputs.add(inputs);
             }catch(FileNotFoundException e) {
                     System.out.println("FAAAAIL");
             }
         }
+
+
+        //Run simulation through virtual memory
         for(int x = 0; x < trace_file_inputs.size(); x++) {
             ArrayList<Integer> ints_to_feed = trace_file_inputs.get(x);
             ram_object.setAccessFile(x);
