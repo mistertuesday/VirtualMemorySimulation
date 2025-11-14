@@ -151,7 +151,7 @@ public class VirtualMemorySimulation {
         //MILESTONE 2
         //First, we need an arraylist with each of the files
         //
-        VirtualMemory ram_object = new VirtualMemory((physical_memory*MB)/(4*KB),files);
+        VirtualMemory ram_object = new VirtualMemory((num_physical_pages - num_system_pages),files);
         ArrayList<File> trace_file_list = new ArrayList<File>();
         ArrayList<ArrayList<Integer>> trace_file_inputs = new ArrayList<ArrayList<Integer>>();
         for(String file_name: files) {

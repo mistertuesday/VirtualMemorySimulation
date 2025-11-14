@@ -54,6 +54,6 @@ public class PageTable {
         this.total_hits++;
     }
     public String toString() {
-        return   pages_from_free +" total pages used " + total_hits + " total hits ";
+        return   pages_from_free +" total pages used " + pages_from_fault + " faults "  + total_hits + " total hits ";
     }
 }
