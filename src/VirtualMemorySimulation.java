@@ -152,6 +152,9 @@ public class VirtualMemorySimulation {
         for(String file_name: files) {
         	trace_file_inputs.add(trace(file_name));
         }
+
+        //Number of times memory is accessed
+        int mapped_virt_pages = 0;
         //Run simulation through virtual memory
         for(int x = 0; x < trace_file_inputs.size(); x++) {
         	//Load up one of the trace file instruction sets
@@ -166,17 +169,28 @@ public class VirtualMemorySimulation {
                 int second_address = int_to_feed.getX()+int_to_feed.getY();
                 //Access the memory at the first address
                 ram_object.accessMemory(first_address);
+                mapped_virt_pages++;
                 //If the page numbers for the first and second address don't line up...
                 //that means we've gone forwards a page and need to run another access.
                 if(getPage(first_address) != getPage(second_address)) {
-                   // System.out.printf("%d is off\n",int_to_feed.getY());
-                   ram_object.accessMemory(second_address);
+                    // System.out.printf("%d is off\n",int_to_feed.getY());
+                    ram_object.accessMemory(second_address);
+                    mapped_virt_pages++;
                 }
             }
-            System.out.printf("Total number of ints to feed: %d\n", ints_to_feed.size());
         }
+        
+        //
+        //Print out memory simulation results
+        //
 
-         ram_object.print();
+        System.out.printf("***** VIRTUAL MEMORY SIMULATION RESULTS *****\n\n");
+        System.out.printf("%-30s %d\n", "Physical Pages Used By SYSTEM:", num_system_pages);
+        System.out.printf("%-30s %d\n\n", "Pages Avasilable to User:", num_physical_pages - num_system_pages); 
+        System.out.printf("%-30s %d\n", "Virtual Pages Mapped:", mapped_virt_pages); 
+        System.out.printf("%15s \n", "------------------------------"); 
+
+//        ram_object.print();
         
     }
 
