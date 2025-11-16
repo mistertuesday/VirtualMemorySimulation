@@ -191,9 +191,8 @@ public class VirtualMemorySimulation {
     	ArrayList<Tuple> outputs = new ArrayList<>();
     	File f = new File(filename);
     	Scanner s = new Scanner(f);
+    	String line;
     	while (s.hasNextLine()) {
-    		//First line is always empty for some odd reason! Just skip it!
-    		String line = s.nextLine();
     		//And so is the LAST LINE, which means this loop won't terminate right without this next part
     		if (!s.hasNextLine()) {
     			break;
@@ -202,7 +201,7 @@ public class VirtualMemorySimulation {
     		line = s.nextLine();
     		//These instruction length lines are in two digit form always, making it super weird.
     		int iLength;
-    		iLength = Integer.decode(line.substring(5,6));
+    		iLength = Integer.parseInt(line.substring(5,7));
     		int sAddress = Integer.decode("0x"+line.substring(10,18));
     		outputs.add(new Tuple(sAddress, iLength));
     		//Third line, dest and source
@@ -210,13 +209,16 @@ public class VirtualMemorySimulation {
     		line = s.nextLine();
     		int dstM;
     		if (line.charAt(17) != '-') {
-    			dstM = Integer.decode(line.substring(6, 14));
+    			dstM = Integer.decode("0x"+line.substring(6,14));
     			outputs.add(new Tuple(dstM, 4));
     		}
     		int srcM;
     		if (line.charAt(46) != '-') {
-    			srcM = Integer.decode(line.substring(33, 41));
+    			srcM = Integer.decode("0x"+line.substring(33,41));
     			outputs.add(new Tuple(srcM, 4));
+    		}
+    		if (s.hasNextLine()) {
+    			line = s.nextLine();
     		}
     	}
     	//No more lines, bye scanner!
