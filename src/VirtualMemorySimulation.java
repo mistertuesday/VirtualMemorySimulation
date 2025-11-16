@@ -202,25 +202,20 @@ public class VirtualMemorySimulation {
     		line = s.nextLine();
     		//These instruction length lines are in two digit form always, making it super weird.
     		int iLength;
-    		if (line.charAt(5) == '0') {
-    			iLength = Integer.parseInt(line.substring(6, 7));
-    		}
-    		else {
-    			iLength = Integer.parseInt(line.substring(5, 7));
-    		}
-    		int sAddress = Integer.parseInt(line.substring(11, 18));
+    		iLength = Integer.decode(line.substring(5,6));
+    		int sAddress = Integer.decode("0x"+line.substring(10,18));
     		outputs.add(new Tuple(sAddress, iLength));
     		//Third line, dest and source
     		//Note to self, assignment document says ASSUME ALL VALID DATA ACCESSES ARE 4 BYTES!!!
     		line = s.nextLine();
     		int dstM;
     		if (line.charAt(17) != '-') {
-    			dstM = Integer.parseInt(line.substring(6, 13));
+    			dstM = Integer.decode(line.substring(6, 14));
     			outputs.add(new Tuple(dstM, 4));
     		}
     		int srcM;
     		if (line.charAt(46) != '-') {
-    			srcM = Integer.parseInt(line.substring(33, 40));
+    			srcM = Integer.decode(line.substring(33, 41));
     			outputs.add(new Tuple(srcM, 4));
     		}
     	}
