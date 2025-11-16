@@ -193,12 +193,18 @@ public class VirtualMemorySimulation {
     	Scanner s = new Scanner(f);
     	String line;
     	while (s.hasNextLine()) {
-    		//And so is the LAST LINE, which means this loop won't terminate right without this next part
-    		if (!s.hasNextLine()) {
-    			break;
-    		}
-    		//Second line, EIP
+    		//First line, EIP
     		line = s.nextLine();
+    		//If the current line is blank, then we need the next one.
+    		//But if it's the final line, we can break the loop to avoid nosuchelement exception
+    		if (line.compareTo("") == 0) {
+    			if (s.hasNextLine() == true) {
+    				line = s.nextLine();
+    			}
+    			else {
+    				break;
+    			}
+    		}
     		//These instruction length lines are in two digit form always, making it super weird.
     		int iLength;
     		iLength = Integer.parseInt(line.substring(5,7));
@@ -216,9 +222,6 @@ public class VirtualMemorySimulation {
     		if (line.charAt(46) != '-') {
     			srcM = Integer.decode("0x"+line.substring(33,41));
     			outputs.add(new Tuple(srcM, 4));
-    		}
-    		if (s.hasNextLine()) {
-    			line = s.nextLine();
     		}
     	}
     	//No more lines, bye scanner!
