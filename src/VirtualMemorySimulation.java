@@ -184,6 +184,7 @@ public class VirtualMemorySimulation {
         //Print out memory simulation results
         //
 
+        System.out.println("");
         System.out.printf("***** VIRTUAL MEMORY SIMULATION RESULTS *****\n\n");
         System.out.printf("%-30s %d\n", "Physical Pages Used By SYSTEM:", num_system_pages);
         System.out.printf("%-30s %d\n\n", "Pages Avasilable to User:", num_physical_pages - num_system_pages); 
