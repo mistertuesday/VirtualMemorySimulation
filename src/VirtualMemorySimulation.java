@@ -197,13 +197,13 @@ public class VirtualMemorySimulation {
         String[] s2 = ram_object.outputs1();
         System.out.printf("%15s \n", "------------------------------");
         System.out.printf("%-30s \n", "Page Table Hits: " + s2[0]);
-        System.out.println("");
+        //System.out.println("");
         System.out.printf("%-30s \n", "Pages From Free: " + s2[1]);
-        System.out.println("");
-        System.out.printf("%-30s \n", "Page Faults: " + s2[2]);
-        System.out.println("");
+        //System.out.println("");
+        System.out.printf("%-30s \n\n\n", "Page Faults: " + s2[2]);
+        //System.out.println("");
         System.out.printf("%-30s \n", "Page Table Usage Per Process:"); 
-        System.out.printf("%15s \n", "------------------------------");
+        System.out.printf("%15s \n\n", "------------------------------");
         //Usage per process values
         int[] upp = ram_object.outputs2();
         int count = 0;
@@ -211,8 +211,9 @@ public class VirtualMemorySimulation {
         	//TODO - NEED TO ROUND THIS TO A NICE CLEAN CRISP 2 DECIMAL PLACES
         	double percentage = (upp[count] / Math.pow(2, 19)) * 100;
         	System.out.print("[" + count + "] " + fn + ":" + "\n");
-        	System.out.printf("Used Page Table Entries: %d (%.2f%%)\n", upp[count], percentage);
+        	System.out.printf("\t%s %d (%.2f%%)\n", "Used Page Table Entries:", upp[count], percentage);
         	//TODO - CALC AND PRINT THE WASTED PAGES FOR EACH TRACE FILE
+                System.out.printf("\t%s %d\n\n", "Page Table Wasted:", (int)((num_physical_pages - num_system_pages) * pte_size - ((upp[count] *pte_size)/8.0)));
         	count++;
         }
     }
