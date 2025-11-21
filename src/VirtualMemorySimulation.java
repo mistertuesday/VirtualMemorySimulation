@@ -190,13 +190,16 @@ public class VirtualMemorySimulation {
         System.out.printf("%-30s %d\n\n", "Pages Available to User:", num_physical_pages - num_system_pages); 
         System.out.printf("%-30s %d\n", "Virtual Pages Mapped:", mapped_virt_pages);
         //Section 2
+        //s2[0] = page hits
+        //s2[1] = pages from free
+        //s2[2] = page faults
         String[] s2 = ram_object.outputs1();
         System.out.printf("%15s \n", "------------------------------");
         System.out.printf("%-30s \n", "Page Table Hits: " + s2[0]);
         System.out.println("");
-        System.out.printf("%-30s \n", "Pages From Free: ");
+        System.out.printf("%-30s \n", "Pages From Free: " + s2[1]);
         System.out.println("");
-        System.out.printf("%-30s \n", "Page Faults: ");
+        System.out.printf("%-30s \n", "Page Faults: " + s2[2]);
         System.out.println("");
         System.out.printf("%-30s \n", "Page Table Usage Per Process:"); 
         System.out.printf("%15s \n", "------------------------------");

@@ -45,14 +45,23 @@ public class PageTable {
     public void incrementPagesFree(){
         this.pages_from_free++;
     }
+    
+    public int getFree() {
+    	return this.pages_from_free;
+    }
 
     public void incrementPagesFault() {
         this.pages_from_fault++;
+    }
+    
+    public int getFault() {
+    	return this.pages_from_fault;
     }
 
     public void incrementHits() {
         this.total_hits++;
     }
+    
     public int getHits() {
     	return this.total_hits;
     }
