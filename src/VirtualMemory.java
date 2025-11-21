@@ -79,4 +79,15 @@ public class VirtualMemory {
     	String outputs = "" + hits + " " + free + " " + faults;
     	return outputs.split(" ");
     }
+    
+    public int[] outputs2() {
+    	int[] outputs = new int[page_tables.size() * 2];
+    	int i = 0;
+    	for (PageTable p : page_tables) {
+    		outputs[i] = p.getFree();
+    		outputs[i + 1] = p.getFault();
+    		i = i + 2;
+    	}
+		return outputs;
+    }
 }

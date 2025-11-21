@@ -175,7 +175,7 @@ public class VirtualMemorySimulation {
                 if(getPage(first_address) != getPage(second_address)) {
                     // System.out.printf("%d is off\n",int_to_feed.getY());
                     ram_object.accessMemory(second_address);
-                    mapped_virt_pages++;
+                    //mapped_virt_pages++;
                 }
             }
         }
@@ -203,9 +203,19 @@ public class VirtualMemorySimulation {
         System.out.println("");
         System.out.printf("%-30s \n", "Page Table Usage Per Process:"); 
         System.out.printf("%15s \n", "------------------------------");
-
-//        ram_object.print();
-        
+        //Usage per process
+        //upp[0] = first trace file free pages
+        //upp[1] = first trace file fault pages
+        //upp[2] = second trace file free pages
+        //and so on and so forth.
+        int[] upp = ram_object.outputs2();
+        int count = 0;
+        int uppIndex = 0;
+        for (String fn : files) {
+        	double percentage = ((upp[uppIndex] + upp[uppIndex + 1]) / Math.pow(2, 19)) * 100;
+        	System.out.print("[" + count + "] " + fn + ":" + "\n");
+        	System.out.println("	Used Page Table Entries: " + (upp[uppIndex] + upp[uppIndex + 1]) + "(" + percentage + ")");
+        }        
     }
 
     //SHIFT METHOD FOR CHECKING PAGE CHECKS
