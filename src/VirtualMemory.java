@@ -52,6 +52,7 @@ public class VirtualMemory {
                 getCurrentTable().incrementPagesFault();
             }
         }
+        //TODO - This hit calc just isn't quite right... It's close, but not close enough.
         else {
         	getCurrentTable().incrementHits();
         }
@@ -81,12 +82,11 @@ public class VirtualMemory {
     }
     
     public int[] outputs2() {
-    	int[] outputs = new int[page_tables.size() * 2];
+    	int[] outputs = new int[page_tables.size()];
     	int i = 0;
     	for (PageTable p : page_tables) {
-    		outputs[i] = p.getFree();
-    		outputs[i + 1] = p.getFault();
-    		i = i + 2;
+    		outputs[i] = p.getFree() + p.getFault();
+    		i++;
     	}
 		return outputs;
     }

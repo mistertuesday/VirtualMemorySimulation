@@ -183,7 +183,8 @@ public class VirtualMemorySimulation {
         //
         //Print out memory simulation results
         //
-
+        
+        //TODO - Fix the atrocious formatting on this I'm bad at that ty
         System.out.println("");
         System.out.printf("***** VIRTUAL MEMORY SIMULATION RESULTS *****\n\n");
         System.out.printf("%-30s %d\n", "Physical Pages Used By SYSTEM:", num_system_pages);
@@ -203,19 +204,17 @@ public class VirtualMemorySimulation {
         System.out.println("");
         System.out.printf("%-30s \n", "Page Table Usage Per Process:"); 
         System.out.printf("%15s \n", "------------------------------");
-        //Usage per process
-        //upp[0] = first trace file free pages
-        //upp[1] = first trace file fault pages
-        //upp[2] = second trace file free pages
-        //and so on and so forth.
+        //Usage per process values
         int[] upp = ram_object.outputs2();
         int count = 0;
-        int uppIndex = 0;
         for (String fn : files) {
-        	double percentage = ((upp[uppIndex] + upp[uppIndex + 1]) / Math.pow(2, 19)) * 100;
+        	//TODO - NEED TO ROUND THIS TO A NICE CLEAN CRISP 2 DECIMAL PLACES
+        	double percentage = (upp[count] / Math.pow(2, 19)) * 100;
         	System.out.print("[" + count + "] " + fn + ":" + "\n");
-        	System.out.println("	Used Page Table Entries: " + (upp[uppIndex] + upp[uppIndex + 1]) + "(" + percentage + ")");
-        }        
+        	System.out.println("Used Page Table Entries: " + upp[count] + " (" + percentage + ")");
+        	//TODO - CALC AND PRINT THE WASTED PAGES FOR EACH TRACE FILE
+        	count++;
+        }
     }
 
     //SHIFT METHOD FOR CHECKING PAGE CHECKS
