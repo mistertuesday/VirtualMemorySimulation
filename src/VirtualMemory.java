@@ -64,9 +64,12 @@ public class VirtualMemory {
         page_tables.get(temp.getAccessProcess()).clearAddress(temp.getMappedAddress());
     }
 
-    public void print() {
-        for(int i = 0; i < trace_files.size(); i++) {
-            System.out.printf("There are %s for %s \n", page_tables.get(i), trace_files.get(i));
-        }
+    public String[] outputs1() {
+    	int hits = 0;
+    	for (PageTable p : page_tables) {
+    		hits = hits + p.getHits();
+    	}
+    	String outputs = "" + hits;
+    	return outputs.split(" ");
     }
 }
