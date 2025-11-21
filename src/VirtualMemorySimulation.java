@@ -174,8 +174,8 @@ public class VirtualMemorySimulation {
                 //that means we've gone forwards a page and need to run another access.
                 if(getPage(first_address) != getPage(second_address)) {
                     // System.out.printf("%d is off\n",int_to_feed.getY());
-                    ram_object.accessMemory(second_address);
-                    //mapped_virt_pages++;
+                    //ram_object.accessMemory(second_address);
+//                    mapped_virt_pages++;
                 }
             }
         }
@@ -211,7 +211,7 @@ public class VirtualMemorySimulation {
         	//TODO - NEED TO ROUND THIS TO A NICE CLEAN CRISP 2 DECIMAL PLACES
         	double percentage = (upp[count] / Math.pow(2, 19)) * 100;
         	System.out.print("[" + count + "] " + fn + ":" + "\n");
-        	System.out.println("Used Page Table Entries: " + upp[count] + " (" + percentage + ")");
+        	System.out.printf("Used Page Table Entries: %d (%.2f%%)\n", upp[count], percentage);
         	//TODO - CALC AND PRINT THE WASTED PAGES FOR EACH TRACE FILE
         	count++;
         }
