@@ -30,7 +30,7 @@ public class PageTable {
     //
     //
     public PhysicalAddress getAddress(int virtual_address) { 
-        total_hits++;
+//        total_hits++;
         return page_table[virtual_address];
     }
 

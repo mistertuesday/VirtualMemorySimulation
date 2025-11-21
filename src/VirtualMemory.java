@@ -52,6 +52,9 @@ public class VirtualMemory {
                 getCurrentTable().incrementPagesFault();
             }
         }
+        else {
+        	getCurrentTable().incrementHits();
+        }
         physical_queue.remove(temp);
         temp.setLastAccess(access_time, access_file, virtual_address);
         physical_queue.add(temp);
