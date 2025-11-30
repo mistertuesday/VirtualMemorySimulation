@@ -148,6 +148,7 @@ public class VirtualMemorySimulation {
         VirtualMemory ram_object = new VirtualMemory((num_physical_pages - num_system_pages),files);
         //Create one list of tuples for each trace file, store each list in another list.
         ArrayList<ArrayList<Tuple>> trace_file_inputs = new ArrayList<ArrayList<Tuple>>();
+        ArrayList<Cache> caches = new ArrayList<Cache>();
         //Parse each trace file and add it to our list of tuple sets.
         for(String file_name: files) {
         	trace_file_inputs.add(trace(file_name));
@@ -155,10 +156,12 @@ public class VirtualMemorySimulation {
 
         //Number of times memory is accessed
         int mapped_virt_pages = 0;
+        int total_cache_accesses = 0;
         //Run simulation through virtual memory
         for(int x = 0; x < trace_file_inputs.size(); x++) {
         	//Load up one of the trace file instruction sets
             ArrayList<Tuple> ints_to_feed = trace_file_inputs.get(x);
+            Cache curr_cache = new Cache(associativity, index_size, tag_size, getPower(block_size));
             //Set the access file and queue for the vram object
             ram_object.setAccessFile(x);
             //Run through each of the instructions.
@@ -166,18 +169,21 @@ public class VirtualMemorySimulation {
             	//Get the first mem address
                 int first_address = int_to_feed.getX();
                 //Offset by the byte count to get the second one
-                int second_address = int_to_feed.getX()+int_to_feed.getY();
+                int second_address = int_to_feed.getX()+int_to_feed.getY()-1;
                 //Access the memory at the first address
                 ram_object.accessMemory(first_address);
+                curr_cache.access(first_address);
                 mapped_virt_pages++;
+                total_cache_accesses++;
                 //If the page numbers for the first and second address don't line up...
                 //that means we've gone forwards a page and need to run another access.
-                if(getPage(first_address) != getPage(second_address)) {
-                    // System.out.printf("%d is off\n",int_to_feed.getY());
-                    //ram_object.accessMemory(second_address);
-//                    mapped_virt_pages++;
+                if(getIndex(first_address, index_size, block_size) != getIndex(second_address, index_size, block_size)) {
+                    //System.out.printf("THEEEEEEEEE: %d %d\n",first_address, second_address );
+                    //curr_cache.access(second_address-1);
+                    total_cache_accesses++;
                 }
             }
+            caches.add(curr_cache);
         }
         
         //
@@ -207,6 +213,9 @@ public class VirtualMemorySimulation {
         //Usage per process values
         int[] upp = ram_object.outputs2();
         int count = 0;
+        int hits = 0;
+        int comp = 0;
+        int conf = 0;
         for (String fn : files) {
         	//TODO - NEED TO ROUND THIS TO A NICE CLEAN CRISP 2 DECIMAL PLACES
         	double percentage = (upp[count] / Math.pow(2, 19)) * 100;
@@ -214,8 +223,16 @@ public class VirtualMemorySimulation {
         	System.out.printf("\t%s %d (%.2f%%)\n", "Used Page Table Entries:", upp[count], percentage);
         	//TODO - CALC AND PRINT THE WASTED PAGES FOR EACH TRACE FILE
                 System.out.printf("\t%s %d\n\n", "Page Table Wasted:", (int)((num_physical_pages - num_system_pages) * pte_size - ((upp[count] *pte_size)/8.0)));
+                hits += caches.get(count).get_hits();
+                comp += caches.get(count).get_comp_misses();
+                conf += caches.get(count).get_conf_misses();
         	count++;
         }
+
+        System.out.printf("***** CACHE SIMULATION RESULTS *****\n\n");
+        System.out.printf("%-30s %-10d (%d addresses)\n","Total Cache Accesses:", total_cache_accesses, mapped_virt_pages); 
+        System.out.printf("Hits %d\n Compulsory Misses: %d\n Conflict Misses: %d\n", hits, comp, conf);
+
     }
 
     //SHIFT METHOD FOR CHECKING PAGE CHECKS
@@ -224,6 +241,11 @@ public class VirtualMemorySimulation {
         return virtual_address >> 12;
     }
     
+    //SHIFT METHOD for testing cache accesses
+    private static int getIndex(int virtual_address, int index_size, int block_size) {
+        return (virtual_address >> getPower(block_size)) & ~(0x7FFFFFF<<getPower(index_size));
+    }
+    //
     //TRACE FILE PARSING - Returns a list of tuple objects corresponding to addresses and byte counts from a singular trace file.
     private static ArrayList<Tuple> trace(String filename) throws FileNotFoundException {
     	ArrayList<Tuple> outputs = new ArrayList<>();
