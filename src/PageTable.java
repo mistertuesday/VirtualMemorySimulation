@@ -11,13 +11,13 @@ public class PageTable {
     private String trace_file;
 
     //Tracking variables for page table hits and pages used
-    private int total_hits;
-    private int pages_from_free;
-    private int pages_from_fault;
+    private long total_hits;
+    private long pages_from_free;
+    private long pages_from_fault;
 
     //Constructor -- initializes the page table array, as well as name
-    public PageTable(int size, String trace_file) {
-        this.page_table = new PhysicalAddress[size];
+    public PageTable(long size, String trace_file) {
+        this.page_table = new PhysicalAddress[(int)size];
         this.trace_file = trace_file;
         total_hits = 0;
         pages_from_free = 0;
@@ -29,24 +29,24 @@ public class PageTable {
     //Necessary getters and setters
     //
     //
-    public PhysicalAddress getAddress(int virtual_address) { 
+    public PhysicalAddress getAddress(long virtual_address) { 
 //        total_hits++;
-        return page_table[virtual_address];
+        return page_table[(int)virtual_address];
     }
 
-    public void setAddress(int virtual_address, PhysicalAddress physical_address) {
-        page_table[virtual_address] = physical_address;
+    public void setAddress(long virtual_address, PhysicalAddress physical_address) {
+        page_table[(int)virtual_address] = physical_address;
     }
 
-    public void clearAddress(int virtual_address) {
-        page_table[virtual_address] = null;
+    public void clearAddress(long virtual_address) {
+        page_table[(int)virtual_address] = null;
     }
 
     public void incrementPagesFree(){
         this.pages_from_free++;
     }
     
-    public int getFree() {
+    public long getFree() {
     	return this.pages_from_free;
     }
 
@@ -54,7 +54,7 @@ public class PageTable {
         this.pages_from_fault++;
     }
     
-    public int getFault() {
+    public long getFault() {
     	return this.pages_from_fault;
     }
 
@@ -62,7 +62,7 @@ public class PageTable {
         this.total_hits++;
     }
     
-    public int getHits() {
+    public long getHits() {
     	return this.total_hits;
     }
     public String toString() {

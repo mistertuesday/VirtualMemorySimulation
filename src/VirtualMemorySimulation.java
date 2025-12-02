@@ -6,9 +6,9 @@ import java.io.FileNotFoundException;
 public class VirtualMemorySimulation {
     
     //KB, MB, B for easy calculations
-    static int BYTE = 8;
-    static int KB = 1024;
-    static int MB = 1048576;
+    static long BYTE = 8;
+    static long KB = 1024;
+    static long MB = 1048576;
 
     //Price for cost calculations, per KB
     static double PRICE_PER_KB = 0.07;
@@ -16,30 +16,30 @@ public class VirtualMemorySimulation {
     public static void main(String[] args) throws FileNotFoundException {
 
         //Declare variables to hold each token passed by command line
-        int cache_size = 0;
-        int block_size = 0;
-        int associativity = 0;
+        long cache_size = 0;
+        long block_size = 0;
+        long associativity = 0;
         String replacement_policy = new String();
-        int physical_memory = 0;
-        int used_memory = 0 ;
-        int instructions = 0 ;
+        long physical_memory = 0;
+        long used_memory = 0 ;
+        long instructions = 0 ;
         ArrayList<String> files = new ArrayList<>();
         
         //Declare calculated variables for Cache
-        int total_blocks = 0;
-        int tag_size = 0;
-        int index_size = 0;
-        int total_rows = 0;
-        int overhead_size = 0;
-        int imp_mem_size = 0;
+        long total_blocks = 0;
+        long tag_size = 0;
+        long index_size = 0;
+        long total_rows = 0;
+        long overhead_size = 0;
+        long imp_mem_size = 0;
         double cost = 0;
 
         //Declare calcluated variables for Physical Memory
-        int num_physical_pages = 0;
-        int num_system_pages = 0;
-        int pte_size = 0;
-        int total_ram = 0;
-        int num_of_files = 0;
+        long num_physical_pages = 0;
+        long num_system_pages = 0;
+        long pte_size = 0;
+        long total_ram = 0;
+        long num_of_files = 0;
 
         //Parse tokens
         for(int i = 0; i < args.length; i = i + 2) {
@@ -52,17 +52,17 @@ public class VirtualMemorySimulation {
                 case "-s":
                 case "–s":
                 case "—s":
-                    cache_size = Integer.parseInt(args[i + 1]);
+                    cache_size = Long.parseLong(args[i + 1]);
                     break;
                 case "-b":
                 case "–b":
                 case "—b":
-                    block_size = Integer.parseInt(args[i + 1]);
+                    block_size = Long.parseLong(args[i + 1]);
                     break;
                 case "-a":
                 case "–a":
                 case "—a":
-                    associativity = Integer.parseInt(args[i + 1]);
+                    associativity = Long.parseLong(args[i + 1]);
                     break;
                 case "-r":
                 case "–r":
@@ -75,17 +75,17 @@ public class VirtualMemorySimulation {
                 case "-p":
                 case "–p":
                 case "—p":
-                    physical_memory = Integer.parseInt(args[i + 1]);
+                    physical_memory = Long.parseLong(args[i + 1]);
                     break;
                 case "-u":
                 case "–u":
                 case "—u":
-                    used_memory = Integer.parseInt(args[i + 1]);
+                    used_memory = Long.parseLong(args[i + 1]);
                     break;
                 case "-n":
                 case "–n":
                 case "—n":
-                    instructions = Integer.parseInt(args[i+1]);
+                    instructions = Long.parseLong(args[i+1]);
                     break;
             }
         }
@@ -150,13 +150,59 @@ public class VirtualMemorySimulation {
         ArrayList<ArrayList<Tuple>> trace_file_inputs = new ArrayList<ArrayList<Tuple>>();
         ArrayList<Cache> caches = new ArrayList<Cache>();
         //Parse each trace file and add it to our list of tuple sets.
+        long instruction_bytes = 0;
         for(String file_name: files) {
-        	trace_file_inputs.add(trace(file_name));
+        
+            ArrayList<Tuple> outputs = new ArrayList<>();
+        	File f = new File(file_name);
+        	Scanner s = new Scanner(f);
+        	String line;
+        	while (s.hasNextLine()) {
+        		//First line, EIP
+        		line = s.nextLine();
+        		//If the current line is blank, then we need the next one.
+        		//But if it's the final line, we can break the loop to avoid nosuchelement exception
+        		if (line.compareTo("") == 0) {
+        			if (s.hasNextLine() == true) {
+        				line = s.nextLine();
+        			}
+        			else {
+        				break;
+        			}
+        		}
+        		//These instruction length lines are in two digit form always, making it super weird.
+        		long iLength;
+        		iLength = Long.parseLong(line.substring(5,7));
+        		long sAddress = Long.decode("0x"+line.substring(10,18));
+        		outputs.add(new Tuple(sAddress, iLength));
+                        instruction_bytes += iLength;
+        		//Third line, dest and source
+        		//Note to self, assignment document says ASSUME ALL VALID DATA ACCESSES ARE 4 BYTES!!!
+        		line = s.nextLine();
+        		long dstM;
+        		if (line.charAt(17) != '-') {
+        			dstM = Long.decode("0x"+line.substring(6,14));
+        			outputs.add(new Tuple(dstM, 4));
+        		}
+        		long srcM;
+        		if (line.charAt(46) != '-') {
+        			srcM = Long.decode("0x"+line.substring(33,41));
+        			outputs.add(new Tuple(srcM, 4));
+        		}
+        	}
+        	//No more lines, bye scanner!
+        	s.close();
+    
+
+
+
+
+            trace_file_inputs.add(outputs);
         }
 
         //Number of times memory is accessed
-        int mapped_virt_pages = 0;
-        int total_cache_accesses = 0;
+        long mapped_virt_pages = 0;
+        long total_cache_accesses = 0;
         //Run simulation through virtual memory
         for(int x = 0; x < trace_file_inputs.size(); x++) {
         	//Load up one of the trace file instruction sets
@@ -167,9 +213,9 @@ public class VirtualMemorySimulation {
             //Run through each of the instructions.
             for(Tuple int_to_feed: ints_to_feed) {
             	//Get the first mem address
-                int first_address = int_to_feed.getX();
+                long first_address = int_to_feed.getX();
                 //Offset by the byte count to get the second one
-                int second_address = int_to_feed.getX()+int_to_feed.getY()-1;
+                long second_address = int_to_feed.getX()+int_to_feed.getY()-1;
                 //Access the memory at the first address
                 ram_object.accessMemory(first_address);
                 curr_cache.access(first_address);
@@ -179,7 +225,7 @@ public class VirtualMemorySimulation {
                 //that means we've gone forwards a page and need to run another access.
                 if(getIndex(first_address, index_size, block_size) != getIndex(second_address, index_size, block_size)) {
                     //System.out.printf("THEEEEEEEEE: %d %d\n",first_address, second_address );
-                    //curr_cache.access(second_address-1);
+                    curr_cache.access(second_address);
                     total_cache_accesses++;
                 }
             }
@@ -211,18 +257,18 @@ public class VirtualMemorySimulation {
         System.out.printf("%-30s \n", "Page Table Usage Per Process:"); 
         System.out.printf("%15s \n\n", "------------------------------");
         //Usage per process values
-        int[] upp = ram_object.outputs2();
+        long[] upp = ram_object.outputs2();
         int count = 0;
-        int hits = 0;
-        int comp = 0;
-        int conf = 0;
+        long hits = 0;
+        long comp = 0;
+        long conf = 0;
         for (String fn : files) {
         	//TODO - NEED TO ROUND THIS TO A NICE CLEAN CRISP 2 DECIMAL PLACES
         	double percentage = (upp[count] / Math.pow(2, 19)) * 100;
         	System.out.print("[" + count + "] " + fn + ":" + "\n");
         	System.out.printf("\t%s %d (%.2f%%)\n", "Used Page Table Entries:", upp[count], percentage);
         	//TODO - CALC AND PRINT THE WASTED PAGES FOR EACH TRACE FILE
-                System.out.printf("\t%s %d\n\n", "Page Table Wasted:", (int)((num_physical_pages - num_system_pages) * pte_size - ((upp[count] *pte_size)/8.0)));
+                System.out.printf("\t%s %d\n\n", "Page Table Wasted:", (long)((num_physical_pages - num_system_pages) * pte_size - ((upp[count] *pte_size)/8.0)));
                 hits += caches.get(count).get_hits();
                 comp += caches.get(count).get_comp_misses();
                 conf += caches.get(count).get_conf_misses();
@@ -231,18 +277,29 @@ public class VirtualMemorySimulation {
 
         System.out.printf("***** CACHE SIMULATION RESULTS *****\n\n");
         System.out.printf("%-30s %-10d (%d addresses)\n","Total Cache Accesses:", total_cache_accesses, mapped_virt_pages); 
-        System.out.printf("Hits %d\n Compulsory Misses: %d\n Conflict Misses: %d\n", hits, comp, conf);
-
+       // System.out.printf("Hits %d\n Compulsory Misses: %d\n Conflict Misses: %d\n", hits, comp, conf);
+        System.out.printf("%-30s %d\n", "--- Instruction Bytes:", instruction_bytes);
+        System.out.printf("%-30s %d\n", "--- SrcDst Bytes:", -1);
+        System.out.printf("%-30s %d\n", "Cache Hits:", hits);
+        System.out.printf("%-30s %d\n", "Cache Misses:", comp+conf);
+        System.out.printf("%-30s %d\n", "--- Compulsory Misses:", comp);
+        System.out.printf("%-30s %d\n", "--- Conflict Misses:", conf);
+        System.out.printf("***** ***** CACHE HIT & MISS RATE *****\n\n");
+        System.out.printf("%-30s %f\n", "Hit Rate:", -1.0);
+        System.out.printf("%-30s %f\n", "Miss Rate:", -1.0);
+        System.out.printf("%-30s %f Cycles/Instruction (%d)\n", "CPI:", -1.0, -1);
+        System.out.printf("%-30s %f KB / %f KB = %f%% Waste: $%f/chip\n", "Unused Cache Space:", -1.0, -1.0, -1.0, -1.0);
+        System.out.printf("%-30s %d / %d\n", "Unused Cache Blocks:", -1, -1);
     }
 
     //SHIFT METHOD FOR CHECKING PAGE CHECKS
     //
-    private static int getPage(int virtual_address) {
+    private static long getPage(long virtual_address) {
         return virtual_address >> 12;
     }
     
     //SHIFT METHOD for testing cache accesses
-    private static int getIndex(int virtual_address, int index_size, int block_size) {
+    private static long getIndex(long virtual_address, long index_size, long block_size) {
         return (virtual_address >> getPower(block_size)) & ~(0x7FFFFFF<<getPower(index_size));
     }
     //
@@ -266,21 +323,21 @@ public class VirtualMemorySimulation {
     			}
     		}
     		//These instruction length lines are in two digit form always, making it super weird.
-    		int iLength;
-    		iLength = Integer.parseInt(line.substring(5,7));
-    		int sAddress = Integer.decode("0x"+line.substring(10,18));
+    		long iLength;
+    		iLength = Long.parseLong(line.substring(5,7));
+    		long sAddress = Long.decode("0x"+line.substring(10,18));
     		outputs.add(new Tuple(sAddress, iLength));
     		//Third line, dest and source
     		//Note to self, assignment document says ASSUME ALL VALID DATA ACCESSES ARE 4 BYTES!!!
     		line = s.nextLine();
-    		int dstM;
+    		long dstM;
     		if (line.charAt(17) != '-') {
-    			dstM = Integer.decode("0x"+line.substring(6,14));
+    			dstM = Long.decode("0x"+line.substring(6,14));
     			outputs.add(new Tuple(dstM, 4));
     		}
-    		int srcM;
+    		long srcM;
     		if (line.charAt(46) != '-') {
-    			srcM = Integer.decode("0x"+line.substring(33,41));
+    			srcM = Long.decode("0x"+line.substring(33,41));
     			outputs.add(new Tuple(srcM, 4));
     		}
     	}
@@ -296,65 +353,65 @@ public class VirtualMemorySimulation {
     //
     //
     //Method for calculating total number of blocks, given cache sizse and block size
-    private static int calcBlocks(int cache_size, int block_size) {
+    private static long calcBlocks(long cache_size, long block_size) {
         return (cache_size*KB)/block_size;
     }
 
     //Method for calculating index bits required for cache
-    private static int calcIndex(int cache_size, int block_size, int associativity) {
+    private static long calcIndex(long cache_size, long block_size, long associativity) {
         return getPower(cache_size*KB) - (getPower(block_size) + getPower(associativity));
     }   
     
     //Method for calculating tag size required for cache
-    private static int calcTagSize(int physical_memory, int index_size, int block_size) {
+    private static long calcTagSize(long physical_memory, long index_size, long block_size) {
         return getPower(physical_memory*MB) - (index_size + getPower(block_size));
     }
 
     //Method for calculating total number of rows
-    private static int calcTotalRows(int index_size) {
-        return (int)Math.pow(2, index_size);
+    private static long calcTotalRows(long index_size) {
+        return (long)Math.pow(2, index_size);
     }
 
     //Method for calculating overhead for cache
-    private static int calcOverhead(int total_blocks, int tag_size) {
+    private static long calcOverhead(long total_blocks, long tag_size) {
         return ((tag_size+1)*total_blocks)/BYTE;
     }
     
     //Method for calculating total memory required for cache
-    private static int calcImpMemory(int overhead_size, int cache_size) {
+    private static long calcImpMemory(long overhead_size, long cache_size) {
         return overhead_size + cache_size*KB;
     }
 
     //Method for calculating cost of cache
-    private static double calcCost(int imp_mem_size) {
+    private static double calcCost(long imp_mem_size) {
         return (imp_mem_size/KB) * PRICE_PER_KB;
     }
 
     //PHYSICAL MEMORY CALC METHODS
     //
     //Method for calculating number of physical pages
-    private static int calcPhysicalPages(int physical_memory) {
+    private static long calcPhysicalPages(long physical_memory) {
         return (physical_memory*MB)/(4*KB);
     }
 
     //Method for calculating number of pages for system
-    private static int calcSystemPages(int num_physical_pages, int used_memory) {
-        return (int)(((double)used_memory/100)*num_physical_pages);
+    private static long calcSystemPages(long num_physical_pages, long used_memory) {
+        return (long)(((double)used_memory/100)*num_physical_pages);
     }
     
     //Method for calculating PTE size
-    private static int calcPTESize(int num_physical_pages) {
+    private static long calcPTESize(long num_physical_pages) {
         return getPower(num_physical_pages) + 1;
     }
 
     //Method for calculating RAM needed
-    private static int calcTotalRam(int cache_size, int num_of_files, int pte_size) {
+    private static long calcTotalRam(long cache_size, long num_of_files, long pte_size) {
         return (cache_size*KB*num_of_files*pte_size)/BYTE;
     }
 
     //Helper method -- takes base and returns the exponent, for powers of 2
-    private static int getPower(int base) {
-        return (int)(Math.log(base)/Math.log(2));
+    private static long getPower(long base) {
+        return (long)(Math.log(base)/Math.log(2));
     }
 }
 

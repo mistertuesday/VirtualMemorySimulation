@@ -1,16 +1,16 @@
 import java.lang.Math;
 
 public class Row {
-    static private int policy = 0;  //Replacement policy - 0 is random, 1 is RR
-    private int valid;              //Number of valid memory addresses in cache
-    private int[] tags;             //Array of tags
+    static private long policy = 0;  //Replacement policy - 0 is random, 1 is RR
+    private long valid;              //Number of valid memory addresses in cache
+    private long[] tags;             //Array of tags
 
-    public Row(int ass) {
+    public Row(long ass) {
         valid = 0;
-        tags = new int[ass];
+        tags = new long[(int)ass];
     }
 
-    public int access(int tag) {
+    public long access(long tag) {
         if (valid == 0) {
             tags[0] = tag;
             valid ++;
@@ -22,7 +22,7 @@ public class Row {
             }
         }
        if (valid < tags.length){
-            tags[valid] = tag;
+            tags[(int)valid] = tag;
             valid++;
             return valid;
         }

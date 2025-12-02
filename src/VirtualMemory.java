@@ -1,17 +1,17 @@
 import java.util.PriorityQueue;
 import java.util.ArrayList;
 public class VirtualMemory {
-    static int TABLE_SIZE = 524288;                         //page table size
+    static long TABLE_SIZE = 524288;                         //page table size
     private PriorityQueue<PhysicalAddress> physical_queue;  //priority queue with physicaladdresses
     private ArrayList<PageTable> page_tables;               //arraylist with each trace file's page table
     private int access_time;                                     //current access #(increments each time memory is accessed 
 
-    private int access_file;                                //int to track which file is currently being processed
-    private int physical_size;
+    private long access_file;                                //int to track which file is currently being processed
+    private long physical_size;
     private ArrayList<String> trace_files;
     
     //Constructor
-    public VirtualMemory(int physical_size, ArrayList<String> trace_files) {
+    public VirtualMemory(long physical_size, ArrayList<String> trace_files) {
         access_time = 0;
         this.physical_size = physical_size;
         this.trace_files = trace_files;
@@ -28,19 +28,19 @@ public class VirtualMemory {
         }
     }
     
-    public void setAccessFile(int new_access_file) {
+    public void setAccessFile(long new_access_file) {
         this.access_file = new_access_file;
         this.physical_queue = new PriorityQueue<PhysicalAddress>();
     }
 
     private PageTable getCurrentTable() {
-        return page_tables.get(access_file);
+        return page_tables.get((int)access_file);
     }
 
 
-    public void accessMemory(int full_virtual_address)
+    public void accessMemory(long full_virtual_address)
     {
-        int virtual_address = full_virtual_address >> 12;
+        long virtual_address = full_virtual_address >> 12;
         PhysicalAddress temp = getCurrentTable().getAddress(virtual_address);
         if (temp == null) {
             if (physical_queue.size()<physical_size) {
@@ -65,13 +65,13 @@ public class VirtualMemory {
 
     private void clean(PhysicalAddress temp) {
         //System.out.printf("Replacing %d\n", temp.getPhysicalAddress());
-        page_tables.get(temp.getAccessProcess()).clearAddress(temp.getMappedAddress());
+        page_tables.get((int)temp.getAccessProcess()).clearAddress(temp.getMappedAddress());
     }
 
     public String[] outputs1() {
-    	int hits = 0;
-    	int free = 0;
-    	int faults = 0;
+    	long hits = 0;
+    	long free = 0;
+    	long faults = 0;
     	for (PageTable p : page_tables) {
     		hits = hits + p.getHits();
     		free = free + p.getFree();
@@ -81,11 +81,11 @@ public class VirtualMemory {
     	return outputs.split(" ");
     }
     
-    public int[] outputs2() {
-    	int[] outputs = new int[page_tables.size()];
-    	int i = 0;
+    public long[] outputs2() {
+    	long[] outputs = new long[page_tables.size()];
+    	long i = 0;
     	for (PageTable p : page_tables) {
-    		outputs[i] = p.getFree() + p.getFault();
+    		outputs[(int)i] = p.getFree() + p.getFault();
     		i++;
     	}
 		return outputs;

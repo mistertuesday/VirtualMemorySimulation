@@ -8,10 +8,10 @@ import java.util.*;
 //
 public class PhysicalAddress implements Comparable<PhysicalAddress> {
     private int last_access;
-    private int address;
-    private static int CURR_ADDRESS = 0;
-    private int access_process;
-    private int mapped_address;
+    private long address;
+    private static long CURR_ADDRESS = 0;
+    private long access_process;
+    private long mapped_address;
 
     //Constructor
     public PhysicalAddress() {
@@ -24,18 +24,18 @@ public class PhysicalAddress implements Comparable<PhysicalAddress> {
 
     //Method for setting the last virtual memory address, and cycle that the address was allocated, as well as the 
     //process that owns the physical page
-    public void setLastAccess(int new_access, int access_process, int mapped_address)
+    public void setLastAccess(int new_access, long access_process, long mapped_address)
     {
         last_access = new_access;
         this.access_process = access_process;
         this.mapped_address = mapped_address;
     }
     
-    public int getMappedAddress() {
+    public long getMappedAddress() {
         return mapped_address;
     }
 
-    public int getAccessProcess() {
+    public long getAccessProcess() {
         return access_process;
     }
 
@@ -43,7 +43,7 @@ public class PhysicalAddress implements Comparable<PhysicalAddress> {
         return last_access;
     }
 
-    public int getPhysicalAddress() {
+    public long getPhysicalAddress() {
         return address;
     }
 
