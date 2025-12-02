@@ -151,6 +151,7 @@ public class VirtualMemorySimulation {
         ArrayList<Cache> caches = new ArrayList<Cache>();
         //Parse each trace file and add it to our list of tuple sets.
         long instruction_bytes = 0;
+        long src_dst_bytes = 0;
         for(String file_name: files) {
         
             ArrayList<Tuple> outputs = new ArrayList<>();
@@ -183,11 +184,13 @@ public class VirtualMemorySimulation {
         		if (line.charAt(17) != '-') {
         			dstM = Long.decode("0x"+line.substring(6,14));
         			outputs.add(new Tuple(dstM, 4));
+                                src_dst_bytes += 4;
         		}
         		long srcM;
         		if (line.charAt(46) != '-') {
         			srcM = Long.decode("0x"+line.substring(33,41));
         			outputs.add(new Tuple(srcM, 4));
+                                src_dst_bytes += 4;
         		}
         	}
         	//No more lines, bye scanner!
@@ -279,7 +282,7 @@ public class VirtualMemorySimulation {
         System.out.printf("%-30s %-10d (%d addresses)\n","Total Cache Accesses:", total_cache_accesses, mapped_virt_pages); 
        // System.out.printf("Hits %d\n Compulsory Misses: %d\n Conflict Misses: %d\n", hits, comp, conf);
         System.out.printf("%-30s %d\n", "--- Instruction Bytes:", instruction_bytes);
-        System.out.printf("%-30s %d\n", "--- SrcDst Bytes:", -1);
+        System.out.printf("%-30s %d\n", "--- SrcDst Bytes:", src_dst_bytes);
         System.out.printf("%-30s %d\n", "Cache Hits:", hits);
         System.out.printf("%-30s %d\n", "Cache Misses:", comp+conf);
         System.out.printf("%-30s %d\n", "--- Compulsory Misses:", comp);

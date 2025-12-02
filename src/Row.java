@@ -11,19 +11,21 @@ public class Row {
     }
 
     public long access(long tag) {
-        if (valid == 0) {
-            tags[0] = tag;
-            valid ++;
-            return 0;
-        }
         for(int i = 0; i < valid; i++) {
             if (tags[i] == tag) {
                 return -1;
             }
         }
+        if (valid == 0) {
+            tags[0] = tag;
+            valid ++;
+            return 0;
+        }
+        
        if (valid < tags.length){
             tags[(int)valid] = tag;
             valid++;
+            System.out.printf("CONFLICT Tag %d conflicts with %d\n",tag, tags[(int)valid-2]);
             return valid;
         }
         if(policy == 0) {

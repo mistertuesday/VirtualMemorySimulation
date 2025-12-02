@@ -7,10 +7,10 @@ public class Cache {
     private long ass; //Associativity, I just don't like having to type it all out all the time
     private long index_size;
     private long tag_size;
-    private long offset_bytes;
+    private long offset_bits;
 
     //Hashmap for storing addresses to access
-    private HashMap<Long, Row> cache_mappings;
+    private HashMap<Long, long[]> cache_mappings;
     
     //Metadata for cache
     private long cache_hits;
@@ -18,15 +18,15 @@ public class Cache {
     private long cache_conf_misses;
     
 
-    public Cache(long ass, long index_size, long tag_size, long offset_bytes) {
+    public Cache(long ass, long index_size, long tag_size, long offset_bits) {
         //Initialize passed values
         this.ass = ass;
         this.index_size = index_size;
         this.tag_size = tag_size;
-        this.offset_bytes = offset_bytes;
+        this.offset_bits = offset_bits;
 
         //Initialize HashMap
-        cache_mappings = new HashMap<Long, Row>();
+        cache_mappings = new HashMap<Long, long[]>();
 
         //Initialize metadata
         cache_hits = 0;
@@ -36,22 +36,40 @@ public class Cache {
 
     public void access(long address) {
         //Temp values -- the tag to be accessed, and the index to be accessed
-        long tag = address >>>(index_size + offset_bytes);
-        long index = (address -(tag<<(index_size+offset_bytes)))>>>offset_bytes;
-//        System.out.printf("Address : %d\tTag: %d\t Index: %d\n", address, tag, index);
+        long tag = address >>(index_size + offset_bits);
+        long index = (address >> offset_bits) & ((1L << index_size) - 1);
+
         //Result of cache access. If -1, tag was found. If 0, compulsory miss. If not 0, conflict miss
         long success = 0;
         if(!cache_mappings.containsKey(index)) {
-            Row temp = new Row(ass);
-            cache_mappings.put(index,temp);
+            long[] row = new long[(int)ass];
+            for(int i = 1; i < ass; i ++) row[i]=-1;
+            row[0] = tag;
+            cache_mappings.put(index,row);
             cache_comp_misses++;
+            return;
         }
-        success = cache_mappings.get(index).access(tag);
-        if(success == -1) cache_hits++;
-        if(success > 0){
-            cache_conf_misses++;
-//            System.out.printf("Address : %d\tTag: %d\t Index: %d\n", address, tag, index);
+        //else{System.out.printf("Dup Add %d\n", address);}
+        long[] temp = cache_mappings.get(index);
+        for(int i = 0; i < ass; i++) {
+            if(temp[i] == tag) {
+                cache_hits++;
+                return;
+            }
         }
+        for(int i = 0; i<ass; i++){
+            if(temp[i] == -1) {
+                temp[i] = tag;
+                cache_conf_misses++;
+                cache_mappings.replace(index,temp);
+                return;
+            }
+        }
+        temp[(int)(Math.random()*ass)]=tag;
+        cache_conf_misses++;
+        cache_mappings.replace(index,temp);
+        return;
+        
     }
 
     public long get_hits() {
