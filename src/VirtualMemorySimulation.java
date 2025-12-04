@@ -301,10 +301,12 @@ public class VirtualMemorySimulation {
         //Firstly, every page fault is 100 cycles.
         long faultCycles = 100 * Integer.parseInt(s2[2]);
         long CPI = faultCycles + instructionCount * 2 + hits + (comp + conf) * 4 * (long)Math.ceil(block_size/4) + effective_calc_count;
-        double unused_cache = ((total_blocks-comp) * (block_size+overhead_size)) / 1024.0;
+        long unused_cache_blocks = total_blocks - cash.get_used_blocks();
+        double unused_cache_percent = unused_cache_blocks/(double)total_blocks;
+        double unused_cache = imp_mem_size * unused_cache_percent/1024;
         System.out.printf("%-30s %.2f Cycles/Instruction (%d)\n", "CPI:", CPI/(double)instructionCount, instructionCount);
-        System.out.printf("%-30s %.2f KB / %.2f KB = %.2f%% Waste: $%.2f/chip\n", "Unused Cache Space:", unused_cache, -1.0, -1.0, -1.0);
-        System.out.printf("%-30s %d / %d\n", "Unused Cache Blocks:", -1, -1);
+        System.out.printf("%-30s %.2f KB / %.2f KB = %.2f%% Waste: $%.2f/chip\n", "Unused Cache Space:", unused_cache, (double)imp_mem_size/KB, unused_cache_percent, cost*unused_cache_percent);
+        System.out.printf("%-30s %d / %d\n", "Unused Cache Blocks:", unused_cache_blocks, total_blocks);
     }
 
     //SHIFT METHOD FOR CHECKING PAGE CHECKS

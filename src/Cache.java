@@ -16,15 +16,16 @@ public class Cache {
 	private long cache_hits;
 	private long cache_comp_misses;
 	private long cache_conf_misses;
-	private HashSet<Long> seenBlocks = new HashSet<>();
-
+	private HashSet<Long> seenBlocks;
+        private HashSet<Long> usedBlocks;
 	public Cache(long ass, long index_size, long tag_size, long offset_bits) {
 		// Initialize passed values
 		this.ass = ass;
 		this.index_size = index_size;
 		this.tag_size = tag_size;
 		this.offset_bits = offset_bits;
-
+                seenBlocks = new HashSet<>();
+                usedBlocks = new HashSet<>();
 		// Initialize HashMap
 		cache_mappings = new HashMap<Long, long[]>();
 
@@ -45,7 +46,7 @@ public class Cache {
 		if (firstEver) {
 			seenBlocks.add(block);
 		}
-
+                usedBlocks.add(block);
 		long[] set = cache_mappings.get(index);
 
 		// First time this set is touched, THIS is a compulsory miss. Otherwise it's a
@@ -111,7 +112,10 @@ public class Cache {
 	public long get_conf_misses() {
 		return cache_conf_misses;
 	}
+        public long get_used_blocks() {
+            return (long)usedBlocks.size();
 
+        }
 	public void reset() {
 		cache_mappings.clear();
 		seenBlocks.clear();
