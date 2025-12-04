@@ -50,7 +50,8 @@ public class Cache {
 
         long[] set = cache_mappings.get(index);
 
-        // First time this set is touched
+        // First time this set is touched, THIS is a compulsory miss. Otherwise it's a conflict miss.
+        // Previous version did not save the cache set touch at all, resulting in false hits and conflicts.
         if (set == null) {
             set = new long[(int)ass];
             for (int i = 0; i < ass; i++) set[i] = -1;
@@ -82,7 +83,7 @@ public class Cache {
             }
         }
 
-        // Full → evict FIFO-style
+        // If cache is full, flush out some!
         for (int i = 1; i < ass; i++) {
             set[i - 1] = set[i];
         }
@@ -91,40 +92,6 @@ public class Cache {
         if (firstEver) cache_comp_misses++;
         else cache_conf_misses++;
     }
-
-//    public void access(long address) {
-//        //Temp values -- the tag to be accessed, and the index to be accessed
-//        long tag = address >>(index_size + offset_bits);
-//        long index = (address >> offset_bits) & ((1L << index_size) - 1);
-//
-//        //Result of cache access. If -1, tag was found. If 0, compulsory miss. If not 0, conflict miss
-//        long success = 0;
-//        if(!cache_mappings.containsKey(index)) {
-//            long[] row = new long[(int)ass];
-//            for(int i = 1; i < ass; i ++) row[i]=-1;
-//            row[0] = tag;
-//            cache_mappings.put(index,row);
-//            cache_comp_misses++;
-//            return;
-//        }
-//        //else{System.out.printf("Dup Add %d\n", address);}
-//        long[] temp = cache_mappings.get(index);
-//        for(int i = 0; i < ass; i++) {
-//            if(temp[i] == tag) {
-//                cache_hits++;
-//                return;
-//            }
-//        }
-//        for(int i = 0; i < ass; i++){
-//            if(temp[i] == -1) {
-//                temp[i] = tag;
-//                cache_conf_misses++;
-//                cache_mappings.replace(index,temp);
-//                return;
-//            }
-//        }
-//        return;
-//    }
 
     public long get_hits() {
         return cache_hits;
