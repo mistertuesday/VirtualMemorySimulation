@@ -195,22 +195,17 @@ public class VirtualMemorySimulation {
         	}
         	//No more lines, bye scanner!
         	s.close();
-    
-
-
-
-
             trace_file_inputs.add(outputs);
         }
 
         //Number of times memory is accessed
         long mapped_virt_pages = 0;
         long total_cache_accesses = 0;
+        Cache cash = new Cache(associativity, index_size, tag_size, getPower(block_size));
         //Run simulation through virtual memory
         for(int x = 0; x < trace_file_inputs.size(); x++) {
         	//Load up one of the trace file instruction sets
             ArrayList<Tuple> ints_to_feed = trace_file_inputs.get(x);
-            Cache curr_cache = new Cache(associativity, index_size, tag_size, getPower(block_size));
             //Set the access file and queue for the vram object
             ram_object.setAccessFile(x);
             //Run through each of the instructions.
@@ -221,18 +216,17 @@ public class VirtualMemorySimulation {
                 long second_address = int_to_feed.getX()+int_to_feed.getY()-1;
                 //Access the memory at the first address
                 ram_object.accessMemory(first_address);
-                curr_cache.access(first_address);
+                cash.access(first_address);
                 mapped_virt_pages++;
                 total_cache_accesses++;
                 //If the page numbers for the first and second address don't line up...
                 //that means we've gone forwards a page and need to run another access.
                 if(getIndex(first_address, index_size, block_size) != getIndex(second_address, index_size, block_size)) {
                     //System.out.printf("THEEEEEEEEE: %d %d\n",first_address, second_address );
-                    curr_cache.access(second_address);
+                    cash.access(second_address);
                     total_cache_accesses++;
                 }
             }
-            caches.add(curr_cache);
         }
         
         //
@@ -271,11 +265,11 @@ public class VirtualMemorySimulation {
         	System.out.print("[" + count + "] " + fn + ":" + "\n");
         	System.out.printf("\t%s %d (%.2f%%)\n", "Used Page Table Entries:", upp[count], percentage);
         	//TODO - CALC AND PRINT THE WASTED PAGES FOR EACH TRACE FILE
-                System.out.printf("\t%s %d\n\n", "Page Table Wasted:", (long)((num_physical_pages - num_system_pages) * pte_size - ((upp[count] *pte_size)/8.0)));
-                hits += caches.get(count).get_hits();
-                comp += caches.get(count).get_comp_misses();
-                conf += caches.get(count).get_conf_misses();
-        	count++;
+            System.out.printf("\t%s %d bytes\n\n", "Page Table Wasted: ", (long)((num_physical_pages - num_system_pages) * pte_size - ((upp[count] *pte_size)/8.0)));
+            hits += cash.get_hits();
+            comp += cash.get_comp_misses();
+            conf += cash.get_conf_misses();
+            count++;
         }
 
         System.out.printf("***** CACHE SIMULATION RESULTS *****\n\n");
