@@ -283,7 +283,9 @@ public class VirtualMemorySimulation {
         System.out.printf("%-30s %d\n", "--- Compulsory Misses:", comp);
         System.out.printf("%-30s %d\n", "--- Conflict Misses:", conf);
         System.out.printf("***** ***** CACHE HIT & MISS RATE *****\n\n");
-        System.out.printf("%-30s %f\n", "Hit Rate:", -1.0);
+        //Calculate hit rate
+        double hitrate = ((double)hits / total_cache_accesses) * 100;
+        System.out.printf("%-30s %.4f%%\n", "Hit Rate:", hitrate);
         System.out.printf("%-30s %f\n", "Miss Rate:", -1.0);
         System.out.printf("%-30s %f Cycles/Instruction (%d)\n", "CPI:", -1.0, -1);
         System.out.printf("%-30s %f KB / %f KB = %f%% Waste: $%f/chip\n", "Unused Cache Space:", -1.0, -1.0, -1.0, -1.0);
