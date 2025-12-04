@@ -202,6 +202,9 @@ public class VirtualMemorySimulation {
         long mapped_virt_pages = 0;
         long total_cache_accesses = 0;
         Cache cash = new Cache(associativity, index_size, tag_size, getPower(block_size));
+        long hits = 0;
+        long comp = 0;
+        long conf = 0;
         //Run simulation through virtual memory
         for(int x = 0; x < trace_file_inputs.size(); x++) {
         	//Load up one of the trace file instruction sets
@@ -227,6 +230,10 @@ public class VirtualMemorySimulation {
                     total_cache_accesses++;
                 }
             }
+            hits += cash.get_hits();
+            comp += cash.get_comp_misses();
+            conf += cash.get_conf_misses();
+            cash.reset();
         }
         
         //
@@ -256,9 +263,6 @@ public class VirtualMemorySimulation {
         //Usage per process values
         long[] upp = ram_object.outputs2();
         int count = 0;
-        long hits = 0;
-        long comp = 0;
-        long conf = 0;
         for (String fn : files) {
         	//TODO - NEED TO ROUND THIS TO A NICE CLEAN CRISP 2 DECIMAL PLACES
         	double percentage = (upp[count] / Math.pow(2, 19)) * 100;
@@ -266,9 +270,6 @@ public class VirtualMemorySimulation {
         	System.out.printf("\t%s %d (%.2f%%)\n", "Used Page Table Entries:", upp[count], percentage);
         	//TODO - CALC AND PRINT THE WASTED PAGES FOR EACH TRACE FILE
             System.out.printf("\t%s %d bytes\n\n", "Page Table Wasted: ", (long)((num_physical_pages - num_system_pages) * pte_size - ((upp[count] *pte_size)/8.0)));
-            hits += cash.get_hits();
-            comp += cash.get_comp_misses();
-            conf += cash.get_conf_misses();
             count++;
         }
 
