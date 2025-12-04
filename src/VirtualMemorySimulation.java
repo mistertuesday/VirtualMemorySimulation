@@ -155,6 +155,7 @@ public class VirtualMemorySimulation {
         //Parse each trace file and add it to our list of tuple sets.
         long instruction_bytes = 0;
         long src_dst_bytes = 0;
+        long effective_calc_count = 0;
         for(String file_name: files) {
         
             ArrayList<Tuple> outputs = new ArrayList<>();
@@ -174,6 +175,7 @@ public class VirtualMemorySimulation {
         				break;
         			}
         		}
+                        instructionCount++;
         		//These instruction length lines are in two digit form always, making it super weird.
         		long iLength;
         		iLength = Long.parseLong(line.substring(5,7));
@@ -188,12 +190,14 @@ public class VirtualMemorySimulation {
         			dstM = Long.decode("0x"+line.substring(6,14));
         			outputs.add(new Tuple(dstM, 4));
                                 src_dst_bytes += 4;
+                                effective_calc_count++;
         		}
         		long srcM;
         		if (line.charAt(46) != '-') {
         			srcM = Long.decode("0x"+line.substring(33,41));
         			outputs.add(new Tuple(srcM, 4));
                                 src_dst_bytes += 4;
+                                effective_calc_count++;
         		}
         	}
         	//No more lines, bye scanner!
@@ -217,7 +221,6 @@ public class VirtualMemorySimulation {
             //Run through each of the instructions.
             for(Tuple int_to_feed: ints_to_feed) {
             	//Add 1 to the instruction count
-            	instructionCount++;
             	//Get the first mem address
                 long first_address = int_to_feed.getX();
                 //Offset by the byte count to get the second one
@@ -297,8 +300,10 @@ public class VirtualMemorySimulation {
         //CPI calculations
         //Firstly, every page fault is 100 cycles.
         long faultCycles = 100 * Integer.parseInt(s2[2]);
-        System.out.printf("%-30s %f Cycles/Instruction (%d)\n", "CPI:", -1.0, -1);
-        System.out.printf("%-30s %f KB / %f KB = %f%% Waste: $%f/chip\n", "Unused Cache Space:", -1.0, -1.0, -1.0, -1.0);
+        long CPI = faultCycles + instructionCount * 2 + hits + (comp + conf) * 4 * (long)Math.ceil(block_size/4) + effective_calc_count;
+        double unused_cache = ((total_blocks-comp) * (block_size+overhead_size)) / 1024.0;
+        System.out.printf("%-30s %.2f Cycles/Instruction (%d)\n", "CPI:", CPI/(double)instructionCount, instructionCount);
+        System.out.printf("%-30s %.2f KB / %.2f KB = %.2f%% Waste: $%.2f/chip\n", "Unused Cache Space:", unused_cache, -1.0, -1.0, -1.0);
         System.out.printf("%-30s %d / %d\n", "Unused Cache Blocks:", -1, -1);
     }
 
