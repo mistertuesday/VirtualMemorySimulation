@@ -40,6 +40,9 @@ public class VirtualMemorySimulation {
         long pte_size = 0;
         long total_ram = 0;
         long num_of_files = 0;
+        
+        //Declare CPI variables
+        long instructionCount = 0;
 
         //Parse tokens
         for(int i = 0; i < args.length; i = i + 2) {
@@ -213,6 +216,8 @@ public class VirtualMemorySimulation {
             ram_object.setAccessFile(x);
             //Run through each of the instructions.
             for(Tuple int_to_feed: ints_to_feed) {
+            	//Add 1 to the instruction count
+            	instructionCount++;
             	//Get the first mem address
                 long first_address = int_to_feed.getX();
                 //Offset by the byte count to get the second one
@@ -289,6 +294,9 @@ public class VirtualMemorySimulation {
         double missrate = ((double)(comp+conf) / total_cache_accesses) * 100;
         System.out.printf("%-30s %.4f%%\n", "Hit Rate:", hitrate);
         System.out.printf("%-30s %.4f%%\n", "Miss Rate:", missrate);
+        //CPI calculations
+        //Firstly, every page fault is 100 cycles.
+        long faultCycles = 100 * Integer.parseInt(s2[2]);
         System.out.printf("%-30s %f Cycles/Instruction (%d)\n", "CPI:", -1.0, -1);
         System.out.printf("%-30s %f KB / %f KB = %f%% Waste: $%f/chip\n", "Unused Cache Space:", -1.0, -1.0, -1.0, -1.0);
         System.out.printf("%-30s %d / %d\n", "Unused Cache Blocks:", -1, -1);
