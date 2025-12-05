@@ -43,7 +43,7 @@ public class VirtualMemorySimulation {
         
         //Declare CPI variables
         long instructionCount = 0;
-
+        int rep = 0 ;
         //Parse tokens
         for(int i = 0; i < args.length; i = i + 2) {
             switch(args[i]) {
@@ -70,10 +70,14 @@ public class VirtualMemorySimulation {
                 case "-r":
                 case "–r":
                 case "—r":
-                    if(args[i+1].equals("rr"))
+                    if(args[i+1].equals("rr")){
                         replacement_policy = "Round Robin";
-                    else
+                        rep = 0;
+                    }
+                    else {
                         replacement_policy = "Random";
+                        rep = 1;
+                    }
                     break;
                 case "-p":
                 case "–p":
@@ -208,7 +212,7 @@ public class VirtualMemorySimulation {
         //Number of times memory is accessed
         long mapped_virt_pages = 0;
         long total_cache_accesses = 0;
-        Cache cash = new Cache(associativity, index_size, tag_size, getPower(block_size));
+        Cache cash = new Cache(rep, associativity, index_size, tag_size, getPower(block_size));
         long hits = 0;
         long comp = 0;
         long conf = 0;

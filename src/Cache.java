@@ -1,6 +1,6 @@
 import java.util.HashMap;
 import java.util.HashSet;
-
+import java.lang.Math;
 public class Cache {
 
 	// Cache properties
@@ -18,7 +18,8 @@ public class Cache {
 	private long cache_conf_misses;
 	private HashSet<Long> seenBlocks;
         private HashSet<Long> usedBlocks;
-	public Cache(long ass, long index_size, long tag_size, long offset_bits) {
+        int replacement_policy;
+	public Cache(int replacement_policy,long ass, long index_size, long tag_size, long offset_bits) {
 		// Initialize passed values
 		this.ass = ass;
 		this.index_size = index_size;
@@ -29,6 +30,7 @@ public class Cache {
 		// Initialize HashMap
 		cache_mappings = new HashMap<Long, long[]>();
 
+                this.replacement_policy=replacement_policy;
 		// Initialize metadata
 		cache_hits = 0;
 		cache_comp_misses = 0;
@@ -90,10 +92,17 @@ public class Cache {
 		}
 
 		// If cache is full, flush out some!
-		for (int i = 1; i < ass; i++) {
-			set[i - 1] = set[i];
-		}
-		set[(int) ass - 1] = tag;
+                if (replacement_policy == 0){
+
+		    for (int i = 1; i < ass; i++) {
+		    	set[i - 1] = set[i];
+		    }
+		    set[(int) ass - 1] = tag;
+                }
+                else {
+                    int replace_mark = (int)(Math.random()*ass);
+                    set[replace_mark]=tag;
+                }
 
 		if (firstEver)
 			cache_comp_misses++;
